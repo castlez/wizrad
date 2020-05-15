@@ -116,6 +116,7 @@ class Game:
         if self.show_grid:
             self.draw_grid()
         self.all_sprites.draw(self.screen)
+        self.log.draw(self.screen)
         pg.display.flip()
 
     def events(self):

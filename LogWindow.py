@@ -1,5 +1,6 @@
 import pygame as pg
 from settings import *
+import os
 
 class LogWindow(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -17,6 +18,10 @@ class LogWindow(pg.sprite.Sprite):
         self.log = INTRO
         self.current_place = 0
         self.current_display = []
+
+        # text stuff
+        fonts = pg.font.get_fonts()
+        self.font = pg.font.SysFont(fonts[0], TEXT_SIZE)
     
     def inspect(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
@@ -37,26 +42,27 @@ class LogWindow(pg.sprite.Sprite):
             draw_lines = self.log
         else:
             draw_lines = self.log[-3::]
-        
-        # draw the log TODO
-        draw = True
+
+        # update the current display contents, if necessary        
         if draw_lines != self.current_display:
             self.current_display = draw_lines
-        else:
-            draw = False
-        
-        if draw:
-            print("----------")
-            for line in self.current_display:
-                tag = line[:1]
-                message = line[2:]
-                if tag == "i":
-                    print(f"INFO: {message}")
-                elif tag == "e":
-                    print(f"EROR: {message}")
-                else:
-                    print(line)
-            print("----------")
+    
+    def draw(self, screen):
+        x = LOG_X
+        y = LOG_Y
+        for line in self.current_display:
+            tag = line[:1]
+            message = line[2:]
+            if tag == "i":
+                to_print = f"INFO: {message}"
+            elif tag == "e":
+                to_print = f"EROR: {message}"
+            else:
+                to_print = line
+            text = self.font.render(to_print, True, (255, 255, 255), (0, 0, 0))
+            screen.blit(text, (x, y))
+            y += LOG_LINE_DIST 
+    
 
             
         

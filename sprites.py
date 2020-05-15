@@ -107,10 +107,13 @@ class BurningPile(WSPRITE):
     
     def inspect(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
-            return "I pile of burning... something? I could study this perhaps... " \
-                    "(right click to interact with things)"
+            return "A magic fire, i better watch out. Hmm.. its interesting (right click to study)"
     
     def update(self):
+        """
+        This moves around a bunch but im kinda ok with 
+        it for now
+        """
         # use the global position of the player to decide what to draw
         cur_g_x = self.game.player.global_x
         cur_g_y = self.game.player.global_y
