@@ -11,6 +11,7 @@ import math
 from settings import *
 from sprites import *
 from Floor import *
+from LogWindow import *
 from dg.dungeonGenerationAlgorithms import RoomAddition
 
 
@@ -28,6 +29,7 @@ class Game:
         self.view = None
         self.load_data()
         self.show_grid = True
+        self.log = None
 
         pg.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
@@ -37,12 +39,20 @@ class Game:
     def new(self):
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
+        self.enemies = pg.sprite.Group()
+        self.inters = pg.sprite.Group()
         self.player = Player(self, 8, 8)
+        self.log = LogWindow(self, 3, 15)
 
         # first floor (TODO start screen)
         self.current_floor = Floor(self, 1)
-        gx, gy = self.current_floor.get_play_start()
+        self.current_floor.populate_floor()
+
+        # put the player in a random place
+        gx, gy = self.current_floor.get_valid_pos()
         self.player.update_global_position(gx, gy)
+
+        # TODO remove
         self.save_map()
 
     def run(self):
@@ -71,7 +81,9 @@ class Game:
                 else:
                     map_string += str(fl[x][y])
             map_string += '\n'
-        with open("last_map.txt", 'w') as f:
+        if not os.path.exists("scraps"):
+            os.makedirs("scraps")
+        with open("scraps/last_map.txt", 'w') as f:
             f.write(map_string)
         print("level map saved!")
 
@@ -88,29 +100,8 @@ class Game:
             cur_g_x = self.player.global_x
             cur_g_y = self.player.global_y
 
-            # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
-            xmin = cur_g_x - 6
-            xmax = cur_g_x + 10
-            ymin = cur_g_y - 6
-            ymax = cur_g_y + 10 
-
-            # draw the walls, i wanna explore
-            fl = self.current_floor.layout
-            local_x_range = range(0, GRIDWIDTH)
-            local_y_range = range(0, GRIDHEIGHT)
-            global_x_range = range(xmin, xmax)
-            global_y_range = range(ymin, ymax)
-
-            for ly, gy in zip(local_y_range, global_y_range):
-                for lx, gx in zip(local_x_range, global_x_range):
-                    if gx >= MAP_WIDTH or gy >= MAP_HEIGHT:
-                        continue
-                    if fl[gx][gy] == 1:
-                        self.current_floor.add_wall(Wall(self, lx, ly, gx, gy))
-                    elif fl[gx][gy] == 0:
-                        self.current_floor.clear_space(lx, ly)
-
-            print(f"cur floor num walls = {len(self.current_floor.walls)}")
+            self.current_floor.update_viewport(cur_g_x, cur_g_y)
+            
         self.player.still = True
         self.all_sprites.update()
 
@@ -151,6 +142,9 @@ class Game:
                     self.player.collisions = not self.player.collisions
                 if event.key == pg.K_o:
                     print(f"group num walls = {len(self.walls)}")
+            elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                mouse_pos = pg.mouse.get_pos()
+                
 
     def show_start_screen(self):
         pass

@@ -1,6 +1,28 @@
 import pygame as pg
 from settings import *
 
+class WSPRITE(pg.sprite.Sprite):
+    """
+    Parent class for all sprites but the player
+    (you are special ;) )
+    """
+    def __init__(self, game, x, y, gx, gy, group, color=GREEN):
+        self.groups = game.all_sprites, group
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.gx = gx
+        self.gy = gy
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+    
+    def update(self):
+        pass
+
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
@@ -47,20 +69,9 @@ class Player(pg.sprite.Sprite):
         return blocked
         
 
-class Wall(pg.sprite.Sprite):
+class Wall(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
-        self.groups = game.all_sprites, game.walls
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
-        self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.gx = gx
-        self.gy = gy
-        self.rect.x = x * TILESIZE
-        self.rect.y = y * TILESIZE
+        super().__init__(game, x, y, gx, gy, game.walls, color=LIGHTGREY)
     
     def update(self):
         # use the global position of the player to decide what to draw
@@ -72,5 +83,48 @@ class Wall(pg.sprite.Sprite):
         xmax = cur_g_x + 10
         ymin = cur_g_y - 6
         ymax = cur_g_y + 10
+
+        # if we are out of sight, despawn
         if self.gx < xmin or self.gx > xmax or self.gy < ymin or self.gy > ymax:
-            self.kill()
+            super().kill()
+
+
+class BurningPile(WSPRITE):
+    """
+    These give you fire
+    """
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.inters, color=RED)
+    
+    def update(self):
+        # use the global position of the player to decide what to draw
+        cur_g_x = self.game.player.global_x
+        cur_g_y = self.game.player.global_y
+
+        # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
+        xmin = cur_g_x - 6
+        xmax = cur_g_x + 10
+        ymin = cur_g_y - 6
+        ymax = cur_g_y + 10
+
+        # if we are out of sight, despawn
+        if self.gx < xmin or self.gx > xmax or self.gy < ymin or self.gy > ymax:
+            super().kill()
+
+class Skeleton(pg.sprite.Sprite):
+    def __init__(self, game, x, y, gx, gy):
+        self.groups = game.all_sprites, game.enemies
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.gx = gx
+        self.gy = gy
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+    
+    def update(self):
+        pass
