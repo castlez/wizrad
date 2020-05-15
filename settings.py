@@ -1,3 +1,8 @@
+# strings
+INTRO = ["i:Welcome to Wizrad! Find all the elements and break "\
+         "the Omni Gem for ultimate POWER",
+         "i:(wasd to move, left click to inspect)"]
+
 # define some colors (R, G, B)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -34,5 +39,5 @@ VIS_LOG_LINES = 3
 
 # Fire
 FIRE = "f"
-FMIN = 1
-FMAX = 3
+FMIN = 20
+FMAX = 30

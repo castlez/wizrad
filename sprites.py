@@ -44,6 +44,11 @@ class Player(pg.sprite.Sprite):
 
         self.collisions = False
     
+    def inspect(self, mouse_pos):
+        if self.rect.collidepoint(mouse_pos):
+            return "I am badass, swagass, Wizrad"
+
+    
     def update_global_position(self, x, y):
         self.global_x = x
         self.global_y = y
@@ -73,6 +78,10 @@ class Wall(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
         super().__init__(game, x, y, gx, gy, game.walls, color=LIGHTGREY)
     
+    def inspect(self, mouse_pos):
+        if self.rect.collidepoint(mouse_pos):
+            return "I think its.. well, it might be.. yeah that is! Its a wall!"
+    
     def update(self):
         # use the global position of the player to decide what to draw
         cur_g_x = self.game.player.global_x
@@ -95,6 +104,11 @@ class BurningPile(WSPRITE):
     """
     def __init__(self, game, x, y, gx, gy):
         super().__init__(game, x, y, gx, gy, game.inters, color=RED)
+    
+    def inspect(self, mouse_pos):
+        if self.rect.collidepoint(mouse_pos):
+            return "I pile of burning... something? I could study this perhaps... " \
+                    "(right click to interact with things)"
     
     def update(self):
         # use the global position of the player to decide what to draw

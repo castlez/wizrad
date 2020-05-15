@@ -14,11 +14,16 @@ class LogWindow(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE * 2
 
         # keep track of the log lines
-        self.log = ["Welcome to Wizrad!"]
+        self.log = INTRO
         self.current_place = 0
         self.current_display = []
     
+    def inspect(self, mouse_pos):
+        if self.rect.collidepoint(mouse_pos):
+            return "Thats my recent thoughts (scroll with arrow keys)"
+        
     def update_place(self, change):
+        # TODO on update if possible... if len(change) > 3 and len()
         self.current_place += change
     
     def info(self, message):
@@ -26,6 +31,7 @@ class LogWindow(pg.sprite.Sprite):
     
     def update(self):
         # get the last VIS_LOG_LINES lines into draw_lines
+        # TODO do something with the current_place to scroll 
         draw_lines = []
         if len(self.log) < 3:
             draw_lines = self.log
@@ -33,10 +39,15 @@ class LogWindow(pg.sprite.Sprite):
             draw_lines = self.log[-3::]
         
         # draw the log TODO
+        draw = True
         if draw_lines != self.current_display:
             self.current_display = draw_lines
+        else:
+            draw = False
+        
+        if draw:
             print("----------")
-            for line in draw_lines:
+            for line in self.current_display:
                 tag = line[:1]
                 message = line[2:]
                 if tag == "i":

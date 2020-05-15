@@ -97,8 +97,10 @@ class Floor:
             for lx, gx in zip(local_x_range, global_x_range):
                 if gx >= MAP_WIDTH or gy >= MAP_HEIGHT:
                     continue
-                
-                value = fl[gx][gy]
+                try:
+                    value = fl[gx][gy]
+                except:
+                    return
                 if value == 1:
                     self.add_wall(Wall(self.game, lx, ly, gx, gy))
                 elif value == "f":
