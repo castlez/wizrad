@@ -71,6 +71,12 @@ class Floor:
                 inter.kill()
                 del self.inters[i]
         
+        # enemies
+        for i, enemy in enumerate(self.enemies):
+            if enemy.x < xmin or enemy.x > xmax or enemy.y < ymin or enemy.y > ymax:
+                enemy.kill()
+                del self.enemies[i]
+        
     
     def update_viewport(self, gx, gy):
         # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view

@@ -12,6 +12,7 @@ from settings import *
 from sprites import *
 from Floor import *
 from LogWindow import *
+from player import *
 from dg.dungeonGenerationAlgorithms import RoomAddition
 
 
@@ -41,6 +42,7 @@ class Game:
         self.walls = pg.sprite.Group()
         self.enemies = pg.sprite.Group()
         self.inters = pg.sprite.Group()
+        self.spells = pg.sprite.Group()
         self.player = Player(self, 8, 8)
         self.log = LogWindow(self, 3, 15)
 
@@ -116,6 +118,8 @@ class Game:
         if self.show_grid:
             self.draw_grid()
         self.all_sprites.draw(self.screen)
+        if self.player.is_firing:
+            self.spells.draw(self.screen)
         self.log.draw(self.screen)
         pg.display.flip()
 
@@ -147,6 +151,16 @@ class Game:
                     self.log.update_place(change=1)
                 if event.key == pg.K_UP:
                     self.log.update_place(change=-1)
+                if event.key == pg.K_p:
+                    self.log.info(f"current spells: {self.player.get_spells()}")
+                if event.key == pg.K_e:
+                    self.log.info(f"current equipped spell: {self.player.equipped_spell}")
+                if event.key == pg.K_SPACE:
+                    mouse_pos = pg.mouse.get_pos()
+                    self.player.fire_spell(mouse_pos)
+            elif event.type == pg.KEYUP:
+                if event.key == pg.K_SPACE:
+                    self.player.is_firing = False
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
                 self.player.inspect_space(mouse_pos)

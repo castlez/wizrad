@@ -1,4 +1,5 @@
 import pygame as pg
+from spells import *
 from settings import *
 
 
@@ -6,6 +7,10 @@ class WSPRITE(pg.sprite.Sprite):
     """
     Parent class for all sprites but the player
     (you are special ;) )
+
+    oh and the log window (because it doesnt move)
+
+    also spells have their own parent
     """
     def __init__(self, game, x, y, gx, gy, group, color=GREEN):
         self.groups = game.all_sprites, group
@@ -21,88 +26,28 @@ class WSPRITE(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.inspect_message = "I have no idea what that is..."
+        self.interact_message = "Not sure what I could do with that..."
     
     def update(self):
-        pass
+        # use the global position of the player to decide what to draw
+        cur_g_x = self.game.player.global_x
+        cur_g_y = self.game.player.global_y
+
+        # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
+        xmin = cur_g_x - 6
+        xmax = cur_g_x + 10
+        ymin = cur_g_y - 6
+        ymax = cur_g_y + 10
+
+        # if we are out of sight, despawn
+        if self.gx < xmin or self.gx > xmax or self.gy < ymin or self.gy > ymax:
+            super().kill()
     
     def inspect(self):
         return self.inspect_message
-
-class Player(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
-        self.groups = game.all_sprites
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(YELLOW)
-        self.rect = self.image.get_rect()
-
-        # position on the screen
-        self.x = x
-        self.y = y
-        
-
-        # position in the level
-        self.global_x = 0
-        self.global_y = 0
-        self.still = True
-
-        self.collisions = False
     
-    def inspect(self):
-        return "I am badass, swagass, Wizrad"
-
-    
-    def update_global_position(self, x, y):
-        self.global_x = x
-        self.global_y = y
-
-    def move(self, dx=0, dy=0):
-        blocked = self.check_collision(dx, dy)
-        if not blocked:
-            self.global_x += dx
-            self.global_y += dy
-            self.still = False
-
-    def update(self):
-        self.rect.x = self.x * TILESIZE
-        self.rect.y = self.y * TILESIZE
-    
-    def check_collision(self, dx, dy):
-        new_x = self.x + dx
-        new_y = self.y + dy
-        blocked = False
-        for wall in self.game.walls:
-            if new_x == wall.x and new_y == wall.y and self.collisions:
-                blocked = True
-        return blocked
-    
-    def inspect_space(self, mouse_pos):
-        message = ""
-        for sprite in self.game.all_sprites:
-            try:
-                if sprite.rect.collidepoint(mouse_pos):
-                    message = sprite.inspect()
-                    break
-            except Exception as e:
-                self.game.log.info(e)
-                continue
-        if message != "" and message != None:
-            self.game.log.info(message)
-        else:
-            self.game.log.info("Its the floor. Im looking at the floor... "
-                            "Maybe i should look at other things")
-
-    def interact_space(self, mouse_pos):        
-        interacted = None
-        for sprite in self.game.all_sprites:
-            try:
-                message = sprite.inspect()
-                if message:
-                    break
-            except Exception as e:
-                self.game.log.info(e)
-                continue
+    def interact(self, player):
+        return self.interact_message
 
 class Wall(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
@@ -113,20 +58,7 @@ class Wall(WSPRITE):
     #     return "I think its.. well, it might be.. yeah that is! Its a wall!"
     
     def update(self):
-        # use the global position of the player to decide what to draw
-        cur_g_x = self.game.player.global_x
-        cur_g_y = self.game.player.global_y
-
-        # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
-        xmin = cur_g_x - 6
-        xmax = cur_g_x + 10
-        ymin = cur_g_y - 6
-        ymax = cur_g_y + 10
-
-        # if we are out of sight, despawn
-        if self.gx < xmin or self.gx > xmax or self.gy < ymin or self.gy > ymax:
-            super().kill()
-
+        super().update()
 
 class BurningPile(WSPRITE):
     """
@@ -134,43 +66,24 @@ class BurningPile(WSPRITE):
     """
     def __init__(self, game, x, y, gx, gy):
         super().__init__(game, x, y, gx, gy, game.inters, color=RED)
-    
-    def inspect(self):
-        return "A magic fire, i better watch out. Hmm.. its interesting (right click to study)"
+        self.inspect_message = "A magic fire, i better watch out. Hmm.. "\
+                               "its interesting (right click to study)"
     
     def update(self):
-        """
-        This moves around a bunch but im kinda ok with 
-        it for now
-        """
-        # use the global position of the player to decide what to draw
-        cur_g_x = self.game.player.global_x
-        cur_g_y = self.game.player.global_y
+        super().update()
+    
+    def interact(self, player):
+        if player.has_element("fire"):
+            return "I already know how to wield fire magic"
+        else:
+            player.add_spell(Fire)
+            return "I studied the pile and learned the secrets of fire magic!"
+            
 
-        # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
-        xmin = cur_g_x - 6
-        xmax = cur_g_x + 10
-        ymin = cur_g_y - 6
-        ymax = cur_g_y + 10
-
-        # if we are out of sight, despawn
-        if self.gx < xmin or self.gx > xmax or self.gy < ymin or self.gy > ymax:
-            super().kill()
-
-class Skeleton(pg.sprite.Sprite):
+class Skeleton(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
-        self.groups = game.all_sprites, game.enemies
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(WHITE)
-        self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.gx = gx
-        self.gy = gy
-        self.rect.x = x * TILESIZE
-        self.rect.y = y * TILESIZE
+        super().__init__(game, x, y, gx, gy, game.inters, color=RED)
+        self.inspect_message = "An animated skeleton. A good fireball should do the trick."
     
     def update(self):
-        pass
+        super().update()
