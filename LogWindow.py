@@ -10,7 +10,8 @@ class LogWindow(pg.sprite.Sprite):
         self.inspect_message = "Thats my recent thoughts (scroll with arrow keys)"
 
         # position should be fixed at the bottom
-        self.image = pg.Surface((TILESIZE*8, TILESIZE*3))
+        self.image = pg.Surface((WIDTH, HEIGHT))
+        self.image.fill(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = x * TILESIZE * 8
         self.rect.y = y * TILESIZE * 2
@@ -50,6 +51,7 @@ class LogWindow(pg.sprite.Sprite):
     def draw(self, screen):
         x = LOG_X
         y = LOG_Y
+        screen.blit(self.image, (x, y))
         for line in self.current_display:
             tag = line[:1]
             message = line[2:]

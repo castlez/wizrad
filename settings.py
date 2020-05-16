@@ -38,6 +38,10 @@ LOG_LINE_DIST = TEXT_SIZE + 5
 LOG_X = 0
 LOG_Y = int(float(HEIGHT)*0.90)
 
+# Movement
+SPRINT_DELAY = 1
+SPRINT_SPEED = 100
+
 ###### Elements ######
 
 # Fire
