@@ -24,7 +24,7 @@ class Game:
 
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
-        pg.key.set_repeat(500, 100)
+        pg.key.set_repeat(SPRINT_DELAY, SPRINT_SPEED)
         self.current_floor = None
         self.view = None
         self.load_data()
@@ -144,9 +144,9 @@ class Game:
                 if event.key == pg.K_o:
                     print(f"group num walls = {len(self.walls)}")
                 if event.key == pg.K_DOWN:
-                    self.log.update_place(change=-1)
-                if event.key == pg.K_UP:
                     self.log.update_place(change=1)
+                if event.key == pg.K_UP:
+                    self.log.update_place(change=-1)
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
                 message = ""
@@ -164,7 +164,6 @@ class Game:
                     self.log.info("Its the floor. Im looking at the floor... "
                                   "Maybe i should look at other things")
                 
-
     def show_start_screen(self):
         pass
 
