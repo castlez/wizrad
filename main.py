@@ -149,21 +149,10 @@ class Game:
                     self.log.update_place(change=1)
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
-                message = ""
-                for sprite in self.all_sprites:
-                    try:
-                        message = sprite.inspect(mouse_pos)
-                        if message:
-                            break
-                    except Exception as e:
-                        self.log.info(e)
-                        continue
-                if message != "" and message != None:
-                    self.log.info(message)
-                else:
-                    self.log.info("Its the floor. Im looking at the floor... "
-                                  "Maybe i should look at other things")
-                
+                self.player.inspect_space(mouse_pos)
+            elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
+                mouse_pos = pg.mouse.get_pos()
+                self.player.interact_space(mouse_pos)
 
     def show_start_screen(self):
         pass

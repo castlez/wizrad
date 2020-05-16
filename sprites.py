@@ -1,6 +1,7 @@
 import pygame as pg
 from settings import *
 
+
 class WSPRITE(pg.sprite.Sprite):
     """
     Parent class for all sprites but the player
@@ -19,9 +20,13 @@ class WSPRITE(pg.sprite.Sprite):
         self.gy = gy
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+        self.inspect_message = "I have no idea what that is..."
     
     def update(self):
         pass
+    
+    def inspect(self):
+        return self.inspect_message
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -44,9 +49,8 @@ class Player(pg.sprite.Sprite):
 
         self.collisions = False
     
-    def inspect(self, mouse_pos):
-        if self.rect.collidepoint(mouse_pos):
-            return "I am badass, swagass, Wizrad"
+    def inspect(self):
+        return "I am badass, swagass, Wizrad"
 
     
     def update_global_position(self, x, y):
@@ -72,15 +76,41 @@ class Player(pg.sprite.Sprite):
             if new_x == wall.x and new_y == wall.y and self.collisions:
                 blocked = True
         return blocked
-        
+    
+    def inspect_space(self, mouse_pos):
+        message = ""
+        for sprite in self.game.all_sprites:
+            try:
+                if sprite.rect.collidepoint(mouse_pos):
+                    message = sprite.inspect()
+                    break
+            except Exception as e:
+                self.game.log.info(e)
+                continue
+        if message != "" and message != None:
+            self.game.log.info(message)
+        else:
+            self.game.log.info("Its the floor. Im looking at the floor... "
+                            "Maybe i should look at other things")
+
+    def interact_space(self, mouse_pos):        
+        interacted = None
+        for sprite in self.game.all_sprites:
+            try:
+                message = sprite.inspect()
+                if message:
+                    break
+            except Exception as e:
+                self.game.log.info(e)
+                continue
 
 class Wall(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
         super().__init__(game, x, y, gx, gy, game.walls, color=LIGHTGREY)
+        self.inspect_message = "I think its.. well, it might be.. yeah that is! Its a wall!"
     
-    def inspect(self, mouse_pos):
-        if self.rect.collidepoint(mouse_pos):
-            return "I think its.. well, it might be.. yeah that is! Its a wall!"
+    # def inspect(self):
+    #     return "I think its.. well, it might be.. yeah that is! Its a wall!"
     
     def update(self):
         # use the global position of the player to decide what to draw
@@ -105,9 +135,8 @@ class BurningPile(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
         super().__init__(game, x, y, gx, gy, game.inters, color=RED)
     
-    def inspect(self, mouse_pos):
-        if self.rect.collidepoint(mouse_pos):
-            return "A magic fire, i better watch out. Hmm.. its interesting (right click to study)"
+    def inspect(self):
+        return "A magic fire, i better watch out. Hmm.. its interesting (right click to study)"
     
     def update(self):
         """

@@ -7,6 +7,7 @@ class LogWindow(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.inspect_message = "Thats my recent thoughts (scroll with arrow keys)"
 
         # position should be fixed at the bottom
         self.image = pg.Surface((TILESIZE*8, TILESIZE*3))
@@ -23,9 +24,8 @@ class LogWindow(pg.sprite.Sprite):
         fonts = pg.font.get_fonts()
         self.font = pg.font.SysFont(fonts[0], TEXT_SIZE)
     
-    def inspect(self, mouse_pos):
-        if self.rect.collidepoint(mouse_pos):
-            return "Thats my recent thoughts (scroll with arrow keys)"
+    def inspect(self):
+        return self.inspect_message
         
     def update_place(self, change):
         # TODO on update if possible... if len(change) > 3 and len()
