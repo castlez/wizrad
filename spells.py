@@ -20,8 +20,8 @@ class WSPELL(pg.sprite.Sprite):
         self.y = game.player.y
         self.pos = pg.math.Vector2(self.x, self.y)
 
-        self.gx = game.player.global_x
-        self.gy = game.player.global_y
+        self.gx = game.player.gx
+        self.gy = game.player.gy
         self.moved = 0  # so the player doesnt die when they cast
         
         # filled out by child class
@@ -92,14 +92,14 @@ class WSPELL(pg.sprite.Sprite):
             super().kill()
             self.game.player.is_firing = False
         else:
+            # update rect location
+            self.rect.x += tx * TILESIZE
+            self.rect.y += ty * TILESIZE
             # check if you hit something
-            newx = self.rect.x + (tx * TILESIZE)
-            newy = self.rect.y + (ty * TILESIZE)
             if self.moved > SPELL_BUFFER:
                 hit_something = False
                 for sprite in self.game.all_sprites:
                         try:
-                            state = sprite.state
                             hit_something = self.hit(sprite)
                             if hit_something:
                                 break
@@ -111,10 +111,6 @@ class WSPELL(pg.sprite.Sprite):
             else:
                 self.moved += 1
 
-            # update rect location
-            self.rect.x += tx * TILESIZE
-            self.rect.y += ty * TILESIZE
-    
     def inspect(self):
         return self.inspect_message
 
@@ -132,6 +128,9 @@ class WSPELL(pg.sprite.Sprite):
         """
         print("WRONG ONE")
         return False
+    
+    def kill(self):
+        super().kill()
 
 class Fire(WSPELL):
     name = "Fire Ball"
@@ -144,6 +143,7 @@ class Fire(WSPELL):
         try:
             if self.rect.collidepoint(target.rect.center):
                 target.take_damage(FIRE_DAMAGE)
+                super().kill()
                 return True
         except Exception as e:
             print(e)

@@ -74,8 +74,8 @@ class Game:
     def save_map(self):
         map_string = ""
         fl = self.current_floor.layout
-        px = self.player.global_x
-        py = self.player.global_y
+        px = self.player.gx
+        py = self.player.gy
         for y in range(0, MAP_HEIGHT):
             for x in range(0, MAP_WIDTH):
                 if x == px and y == py:
@@ -108,8 +108,8 @@ class Game:
         
         if self.tick:
             # use the global position of the player to decide what to draw
-            cur_g_x = self.player.global_x
-            cur_g_y = self.player.global_y
+            cur_g_x = self.player.gx
+            cur_g_y = self.player.gy
 
             self.current_floor.update_viewport(cur_g_x, cur_g_y)
             self.all_sprites.update()
@@ -190,8 +190,8 @@ class Game:
         gx and gy are global quards
         """
         # use the global position of the player to decide what to draw
-        cur_g_x = self.player.global_x
-        cur_g_y = self.player.global_y
+        cur_g_x = self.player.gx
+        cur_g_y = self.player.gy
 
         # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
         xmin = cur_g_x - 6
@@ -219,4 +219,3 @@ while True:
     while alive:
         g.new()
         alive = g.run()
-    pg.quit()

@@ -129,4 +129,7 @@ class Floor:
         for _ in range(num_fire):
             x, y = self.get_valid_pos()
             self.layout[x][y] = FIRE
+        
+        # skeletons
+        num_skele = random.randint(SKMIN, SKMAX)
 

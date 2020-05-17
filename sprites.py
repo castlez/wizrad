@@ -43,13 +43,14 @@ class Wall(WSPRITE):
         super().__init__(game, x, y, gx, gy, game.walls, color=LIGHTGREY)
         self.inspect_message = "I think its.. well, it might be.. yeah that is! Its a wall!"
     
-    # def inspect(self):
-    #     return "I think its.. well, it might be.. yeah that is! Its a wall!"
+    def inspect(self):
+        return "I think its.. well, it might be.. yeah that is! Its a wall!"
     
     def update(self):
         super().update()
     
     def take_damage(self, amount):
+        print("wall hit")
         self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
 
 class BurningPile(WSPRITE):

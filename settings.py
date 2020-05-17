@@ -63,3 +63,12 @@ FIRE = "f"
 FMIN = 20
 FMAX = 30
 FIRE_DAMAGE = 5
+
+###### Enemies ######
+
+# Skeletons
+SKELETON = "sk"
+SKMIN = 20
+SKMAX = 30
+SKLIFE = 5
+SKDAMAGE = 10

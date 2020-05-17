@@ -25,8 +25,8 @@ class Player(pg.sprite.Sprite):
         self.dy = 0
         
         # position in the level
-        self.global_x = 0
-        self.global_y = 0
+        self.gx = 0
+        self.gy = 0
         self.still = True
 
         self.collisions = False
@@ -46,16 +46,16 @@ class Player(pg.sprite.Sprite):
         return "I am badass, swagass, Wizrad"
 
     def update_global_position(self, x, y):
-        self.global_x = x
-        self.global_y = y
+        self.gx = x
+        self.gy = y
 
     def move(self, dx=0, dy=0):
         blocked = self.check_collision(dx, dy)
         if not blocked:
             self.dx = dx
             self.dy = dy
-            self.global_x += dx
-            self.global_y += dy
+            self.gx += dx
+            self.gy += dy
             self.still = False
 
     def update(self):
