@@ -31,6 +31,7 @@ class Game:
         self.load_data()
         self.show_grid = True
         self.log = None
+        self.tick = False
 
         pg.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
@@ -97,19 +98,24 @@ class Game:
         sys.exit()
 
     def update(self):
-        # TODO: figure out if "or True" is needed here
-        # i.e. do i always update the viewport or only
-        # when moving?
-        if not self.player.still or True:
+        # only update on tick
+        # (currently just player movement)
+        if not self.player.still:
+            self.tick = True
+        
+        if self.tick:
             # use the global position of the player to decide what to draw
             cur_g_x = self.player.global_x
             cur_g_y = self.player.global_y
 
             self.current_floor.update_viewport(cur_g_x, cur_g_y)
-            
-        # self.player.still = True
-        self.all_sprites.update()
-        self.spells.update()
+            self.all_sprites.update()
+            self.spells.update()    
+            self.player.still = True
+            self.tick = False
+            self.player.dx = 0
+            self.player.dy = 0
+        
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -160,17 +166,36 @@ class Game:
                 if event.key == pg.K_e:
                     self.log.info(f"current equipped spell: {self.player.equipped_spell}")
                 if event.key == pg.K_SPACE:
-                    mouse_pos = pg.mouse.get_pos()
-                    self.player.fire_spell(mouse_pos)
-            # elif event.type == pg.KEYUP:
-            #     if event.key == pg.K_SPACE:
-            #         self.player.is_firing = False
+                    if not self.player.is_firing:
+                        mouse_pos = pg.mouse.get_pos()
+                        self.player.fire_spell(mouse_pos)
+                if event.key == pg.K_RETURN:
+                    self.tick = True
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
                 self.player.inspect_space(mouse_pos)
             elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
                 mouse_pos = pg.mouse.get_pos()
                 self.player.interact_space(mouse_pos)
+    
+    def object_in_view(self, gx, gy):
+        """
+        gx and gy are global quards
+        """
+        # use the global position of the player to decide what to draw
+        cur_g_x = self.player.global_x
+        cur_g_y = self.player.global_y
+
+        # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
+        xmin = cur_g_x - 6
+        xmax = cur_g_x + 10
+        ymin = cur_g_y - 6
+        ymax = cur_g_y + 10
+
+        # if we are out of sight, despawn
+        if gx < xmin or gx > xmax or gy < ymin or gy > ymax:
+            return False
+        return True
 
     def show_start_screen(self):
         pass

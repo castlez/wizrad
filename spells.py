@@ -34,20 +34,16 @@ class WSPELL(pg.sprite.Sprite):
         self.rect.x = self.x * TILESIZE
         self.rect.y = self.y * TILESIZE
 
-        # determine the shot directions, first get mouse position in tiles
-        print("------")
+        # determine the shot directions, 
+        # first get mouse position in tiles
+        # then normalize to -1, 0, 1 for x and y
         mx = int(mouse_pos[0]/TILESIZE)
         my = int(mouse_pos[1]/TILESIZE)
-        print(f"(mx, my) = ({mx}, {my})")
-
-        # finally normalize to -1, 0, 1
         dx, dy = self.normalize_quards(mx, my)
-        print(f"(dx, dy) = ({dx}, {dy})")
-        
-        print("------")
-
-        # self.target_pos = [dx, dy]
         self.target_pos = [dx, dy]
+        
+        # time tracking to change spell speed
+        self.cur_interval = time.time()
     
     def normalize_quards(self, x, y):
         """
@@ -74,53 +70,34 @@ class WSPELL(pg.sprite.Sprite):
             ry = -1
         return rx, ry
 
-    
     def __str__(self):
         return self.name
     
     def update(self):
-        self.rect.x += self.target_pos[0] * TILESIZE
-        self.rect.y += self.target_pos[1] * TILESIZE
-            
-    
-    # def update(self):
-    #     print("---- update ----")
-    #     delta = self.pos + self.target_pos
-    #     direction = delta.normalize()
-    #     print(f"normy: {direction}")
-    #     self.vel = direction * 6
-    #     #self.vel = pg.math.Vector2(int(self.vel[0]), int(self.vel[1]))
-    #     self.vel = pg.math.Vector2(1, 2)
+        # first check if the player moved
+        # and adjust for the new viewport
+        dx = self.game.player.dx
+        dy = self.game.player.dy
+        tx = self.target_pos[0]
+        ty = self.target_pos[1]
+        tx -= dx
+        ty -= dy
+        print("----")
+        print(f"self.target_pos = {self.target_pos}")
+        print(f"dx,dy={dx},{dy}")
+        print(f"tx,ty={tx},{ty}")
+        print("----")
 
-    #     self.shot_start = time.time()
-    #     print(f"updating from {self.pos} to {self.pos + self.vel}")
-    #     # use the global position of the player to decide what to draw
-    #     cur_g_x = self.game.player.global_x
-    #     cur_g_y = self.game.player.global_y
-
-    #     xmin = cur_g_x - 6
-    #     xmax = cur_g_x + 10
-    #     ymin = cur_g_y - 6
-    #     ymax = cur_g_y + 10
-    #     self.gx += self.vel[0]
-    #     self.gy += self.vel[1]
-    #     print(f"gx,gy = ({self.gx}, {self.gy})")
-
-    #     # if we are out of sight, despawn
-    #     if self.gx < xmin or self.gx > xmax or self.gy < ymin or self.gy > ymax:
-    #         print(f"view: (xmin{xmin}, xmax{xmax}), (ymin{ymin}, ymax{ymax})")
-    #         print("killing")
-    #         super().kill()
-
-    #     # update location
-    #     # self.pos = self.pos + self.vel
-    #     # print(f"new vel: {self.vel}")
-    #     newx = self.rect.x
-    #     newy = self.rect.y + 1
-    #     self.rect.x = newx * TILESIZE
-    #     self.rect.x = newy * TILESIZE
-
-    #     print("--------")
+        # update the global position and ensure we're still in view
+        self.gx += self.target_pos[0]
+        self.gy += self.target_pos[1]
+        if not self.game.object_in_view(self.gx, self.gy):
+            super().kill()
+            self.game.player.is_firing = False
+        else:
+            # update rect location
+            self.rect.x += tx * TILESIZE
+            self.rect.y += ty * TILESIZE
     
     def inspect(self):
         return self.inspect_message

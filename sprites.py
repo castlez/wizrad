@@ -29,18 +29,7 @@ class WSPRITE(pg.sprite.Sprite):
         self.interact_message = "Not sure what I could do with that..."
     
     def update(self):
-        # use the global position of the player to decide what to draw
-        cur_g_x = self.game.player.global_x
-        cur_g_y = self.game.player.global_y
-
-        # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
-        xmin = cur_g_x - 6
-        xmax = cur_g_x + 10
-        ymin = cur_g_y - 6
-        ymax = cur_g_y + 10
-
-        # if we are out of sight, despawn
-        if self.gx < xmin or self.gx > xmax or self.gy < ymin or self.gy > ymax:
+        if not self.game.object_in_view(self.gx, self.gy):
             super().kill()
     
     def inspect(self):

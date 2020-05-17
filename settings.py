@@ -44,6 +44,9 @@ LOG_Y = int(float(HEIGHT)*0.90)
 SPRINT_DELAY = 1
 SPRINT_SPEED = 100
 
+# the interval of time in which things happen
+TIME_INTERVAL = 0.5
+
 ###### Elements/Spells ######
 
 FIRING_SPEED = 15

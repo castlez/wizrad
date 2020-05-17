@@ -17,9 +17,11 @@ class Player(pg.sprite.Sprite):
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
 
-        # position on the screen
+        # position on the screen with current change
         self.x = x
         self.y = y
+        self.dx = 0
+        self.dy = 0
         
         # position in the level
         self.global_x = 0
@@ -43,6 +45,8 @@ class Player(pg.sprite.Sprite):
     def move(self, dx=0, dy=0):
         blocked = self.check_collision(dx, dy)
         if not blocked:
+            self.dx = dx
+            self.dy = dy
             self.global_x += dx
             self.global_y += dy
             self.still = False
