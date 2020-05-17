@@ -27,6 +27,8 @@ MAP_HEIGHT = 60
 FPS = 60
 TITLE = "Wizrad"
 BGCOLOR = DARKGREY
+# the interval of time in which things happen
+TIME_INTERVAL = 0.5
 
 # Viewport (camera) sizes (32 wide, 24 high)
 TILESIZE = 32
@@ -40,12 +42,13 @@ LOG_LINE_DIST = TEXT_SIZE + 5
 LOG_X = 0
 LOG_Y = int(float(HEIGHT)*0.90)
 
+###### Player ######
+
+PLAYER_START_HEALTH = 10
+
 # Movement
 SPRINT_DELAY = 1
 SPRINT_SPEED = 100
-
-# the interval of time in which things happen
-TIME_INTERVAL = 0.5
 
 ###### Elements/Spells ######
 
@@ -55,3 +58,4 @@ FIRING_SPEED = 15
 FIRE = "f"
 FMIN = 20
 FMAX = 30
+FIRE_DAMAGE = 5

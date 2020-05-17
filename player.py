@@ -16,6 +16,7 @@ class Player(pg.sprite.Sprite):
         # self.image = pg.Surface(self.image.get_size()).convert_alpha()
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
+        self.state = PlayerState()
 
         # position on the screen with current change
         self.x = x
@@ -34,6 +35,15 @@ class Player(pg.sprite.Sprite):
         self.spells = []
         self.equipped_spell = None
         self.is_firing = False
+    
+    def take_damage(self, amount):
+        try:
+            self.state.health -= amount
+        except Exception as e:
+            print(e)
+        self.game.log.info(f"OUCH. Remaining health: {self.state.health}")
+        if self.state.health <= 0:
+            self.state.alive = False
     
     def inspect(self):
         return "I am badass, swagass, Wizrad"
@@ -117,3 +127,8 @@ class Player(pg.sprite.Sprite):
         if self.equipped_spell:
             self.is_firing = True
             self.equipped_spell(self.game, mouse_pos)
+
+class PlayerState:
+    health = PLAYER_START_HEALTH
+    known_spells = None
+    alive = True

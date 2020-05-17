@@ -17,7 +17,9 @@ class LogWindow(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE * 2
 
         # keep track of the log lines
+        print("setting log to intro")
         self.log = INTRO
+        print(f"content = {self.log}")
         self.current_place = 0
         self.current_display = []
 

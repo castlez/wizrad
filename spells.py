@@ -27,6 +27,7 @@ class WSPELL(pg.sprite.Sprite):
         self.elements = []  
         self.inspect_message = "Its a spell of some kind"
         self.interact_message = "Not sure what I could do with that..."
+        self.effect = None
 
         # shooting
         self.vel = None
@@ -82,11 +83,6 @@ class WSPELL(pg.sprite.Sprite):
         ty = self.target_pos[1]
         tx -= dx
         ty -= dy
-        print("----")
-        print(f"self.target_pos = {self.target_pos}")
-        print(f"dx,dy={dx},{dy}")
-        print(f"tx,ty={tx},{ty}")
-        print("----")
 
         # update the global position and ensure we're still in view
         self.gx += self.target_pos[0]
@@ -95,6 +91,22 @@ class WSPELL(pg.sprite.Sprite):
             super().kill()
             self.game.player.is_firing = False
         else:
+            # check if you hit something
+            newx = self.rect.x + (tx * TILESIZE)
+            newy = self.rect.y + (ty * TILESIZE)
+            hit_something = False
+            for sprite in self.game.all_sprites:
+                    try:
+                        state = sprite.state
+                        hit_something = self.hit(sprite)
+                        if hit_something:
+                            break
+                    except:
+                        pass
+            if hit_something:
+                super().kill()
+                self.game.player.is_firing = False
+
             # update rect location
             self.rect.x += tx * TILESIZE
             self.rect.y += ty * TILESIZE
@@ -108,6 +120,14 @@ class WSPELL(pg.sprite.Sprite):
         else:
             player.equipped_spell = self
             return f"I equipped the spell '{self.name}'"
+    
+    def hit(self, target):
+        """
+        Anything that can hit something has this!
+        what happens when this hits something
+        """
+        print("WRONG ONE")
+        return False
 
 class Fire(WSPELL):
     name = "Fire Ball"
@@ -115,6 +135,14 @@ class Fire(WSPELL):
         super().__init__(game, target_pos, color=RED)
         self.elements.append("fire")
         self.inspect_message = "a Fire Ball spell"
+    
+    def hit(self, target):
+        try:
+            target.take_damage(FIRE_DAMAGE)
+            return True
+        except:
+            return False
+
 
 
             

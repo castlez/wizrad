@@ -88,7 +88,7 @@ class Game:
             os.makedirs("scraps")
         with open("scraps/last_map.txt", 'w') as f:
             f.write(map_string)
-        print("level map saved!")
+        print("level map saved in scraps/last_map.txt!")
 
     def quit(self, save_map=False):
         if save_map:
@@ -115,7 +115,9 @@ class Game:
             self.tick = False
             self.player.dx = 0
             self.player.dy = 0
-        
+
+        if not self.player.state.alive:
+            self.playing = False
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -204,9 +206,9 @@ class Game:
         pass
 
 # create the game object
-g = Game()
-g.show_start_screen()
 while True:
-    g.new()
-    g.run()
-    g.show_go_screen()
+    g = Game()
+    g.show_start_screen()
+    while True:
+        g.new()
+        g.run()
