@@ -48,6 +48,9 @@ class Wall(WSPRITE):
     
     def update(self):
         super().update()
+    
+    def take_damage(self, amount):
+        self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
 
 class BurningPile(WSPRITE):
     """

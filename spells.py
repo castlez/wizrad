@@ -22,6 +22,7 @@ class WSPELL(pg.sprite.Sprite):
 
         self.gx = game.player.global_x
         self.gy = game.player.global_y
+        self.moved = 0  # so the player doesnt die when they cast
         
         # filled out by child class
         self.elements = []  
@@ -94,18 +95,21 @@ class WSPELL(pg.sprite.Sprite):
             # check if you hit something
             newx = self.rect.x + (tx * TILESIZE)
             newy = self.rect.y + (ty * TILESIZE)
-            hit_something = False
-            for sprite in self.game.all_sprites:
-                    try:
-                        state = sprite.state
-                        hit_something = self.hit(sprite)
-                        if hit_something:
-                            break
-                    except:
-                        pass
-            if hit_something:
-                super().kill()
-                self.game.player.is_firing = False
+            if self.moved > SPELL_BUFFER:
+                hit_something = False
+                for sprite in self.game.all_sprites:
+                        try:
+                            state = sprite.state
+                            hit_something = self.hit(sprite)
+                            if hit_something:
+                                break
+                        except:
+                            pass
+                if hit_something:
+                    super().kill()
+                    self.game.player.is_firing = False
+            else:
+                self.moved += 1
 
             # update rect location
             self.rect.x += tx * TILESIZE
@@ -138,10 +142,14 @@ class Fire(WSPELL):
     
     def hit(self, target):
         try:
-            target.take_damage(FIRE_DAMAGE)
-            return True
-        except:
-            return False
+            if self.rect.collidepoint(target.rect.center):
+                target.take_damage(FIRE_DAMAGE)
+                return True
+        except Exception as e:
+            print(e)
+            
+        return False
+
 
 
 

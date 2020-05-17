@@ -47,6 +47,8 @@ class Game:
         self.player = Player(self, 8, 8)
         self.log = LogWindow(self, 3, 15)
 
+
+
         # first floor (TODO start screen)
         self.current_floor = Floor(self, 1)
         self.current_floor.populate_floor()
@@ -61,18 +63,19 @@ class Game:
     def run(self):
         # game loop - set self.playing = False to end the game
         self.playing = True
+        self.log.init()
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
             self.update()
             self.draw()
+        return self.playing
     
     def save_map(self):
         map_string = ""
         fl = self.current_floor.layout
         px = self.player.global_x
         py = self.player.global_y
-        print(f"Player should be at ln {py} col {px}")
         for y in range(0, MAP_HEIGHT):
             for x in range(0, MAP_WIDTH):
                 if x == px and y == py:
@@ -115,6 +118,7 @@ class Game:
             self.tick = False
             self.player.dx = 0
             self.player.dy = 0
+        self.log.update()
 
         if not self.player.state.alive:
             self.playing = False
@@ -176,6 +180,7 @@ class Game:
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
                 self.player.inspect_space(mouse_pos)
+                self.tick = True
             elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
                 mouse_pos = pg.mouse.get_pos()
                 self.player.interact_space(mouse_pos)
@@ -207,8 +212,11 @@ class Game:
 
 # create the game object
 while True:
+    print(" ________  new game ________")
     g = Game()
     g.show_start_screen()
-    while True:
+    alive = True
+    while alive:
         g.new()
-        g.run()
+        alive = g.run()
+    pg.quit()

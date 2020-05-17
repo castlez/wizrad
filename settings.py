@@ -54,6 +54,10 @@ SPRINT_SPEED = 100
 
 FIRING_SPEED = 15
 
+# how far a spell must travel (in tiles) before
+# it tries to hit things
+SPELL_BUFFER = 0
+
 # Fire
 FIRE = "f"
 FMIN = 20

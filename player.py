@@ -37,10 +37,7 @@ class Player(pg.sprite.Sprite):
         self.is_firing = False
     
     def take_damage(self, amount):
-        try:
-            self.state.health -= amount
-        except Exception as e:
-            print(e)
+        self.state.health -= amount
         self.game.log.info(f"OUCH. Remaining health: {self.state.health}")
         if self.state.health <= 0:
             self.state.alive = False

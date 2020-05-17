@@ -17,15 +17,17 @@ class LogWindow(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE * 2
 
         # keep track of the log lines
-        print("setting log to intro")
-        self.log = INTRO
-        print(f"content = {self.log}")
         self.current_place = 0
         self.current_display = []
+        self.log = []
 
         # text stuff
         fonts = pg.font.get_fonts()
         self.font = pg.font.SysFont(fonts[0], TEXT_SIZE)
+    
+    def init(self):
+        for l in INTRO:
+            self.log.append(l)
     
     def inspect(self):
         return self.inspect_message
