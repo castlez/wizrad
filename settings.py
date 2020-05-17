@@ -16,6 +16,8 @@ YELLOW = (255, 255, 0)
 WIDTH = 512   # TILESIZE * 32
 HEIGHT = 512  # TILESIZE * 32
 TEXTBOX_HEIGHT = 10
+PLAYER_X = 8
+PLAYER_Y = 8
 
 # full mape size (for generation)
 MAP_WIDTH = 80
@@ -42,7 +44,9 @@ LOG_Y = int(float(HEIGHT)*0.90)
 SPRINT_DELAY = 1
 SPRINT_SPEED = 100
 
-###### Elements ######
+###### Elements/Spells ######
+
+FIRING_SPEED = 15
 
 # Fire
 FIRE = "f"

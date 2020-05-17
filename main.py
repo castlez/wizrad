@@ -97,15 +97,19 @@ class Game:
         sys.exit()
 
     def update(self):
-        if not self.player.still:
+        # TODO: figure out if "or True" is needed here
+        # i.e. do i always update the viewport or only
+        # when moving?
+        if not self.player.still or True:
             # use the global position of the player to decide what to draw
             cur_g_x = self.player.global_x
             cur_g_y = self.player.global_y
 
             self.current_floor.update_viewport(cur_g_x, cur_g_y)
             
-        self.player.still = True
+        # self.player.still = True
         self.all_sprites.update()
+        self.spells.update()
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -118,8 +122,8 @@ class Game:
         if self.show_grid:
             self.draw_grid()
         self.all_sprites.draw(self.screen)
-        if self.player.is_firing:
-            self.spells.draw(self.screen)
+        # if self.player.is_firing:
+        self.spells.draw(self.screen)
         self.log.draw(self.screen)
         pg.display.flip()
 
@@ -158,9 +162,9 @@ class Game:
                 if event.key == pg.K_SPACE:
                     mouse_pos = pg.mouse.get_pos()
                     self.player.fire_spell(mouse_pos)
-            elif event.type == pg.KEYUP:
-                if event.key == pg.K_SPACE:
-                    self.player.is_firing = False
+            # elif event.type == pg.KEYUP:
+            #     if event.key == pg.K_SPACE:
+            #         self.player.is_firing = False
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
                 self.player.inspect_space(mouse_pos)

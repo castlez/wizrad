@@ -43,9 +43,14 @@ class Floor:
                 return x, y
     
     def clear_space(self, x, y):
+        # TODO: i dont want to have to do this
+        # for every type of thing in a floor
         for wall in self.walls:
             if wall.x == x and wall.y == y:
                 wall.kill()
+        for inter in self.inters:
+            if inter.x == x and inter.y == y:
+                inter.kill()
 
     def add_wall(self, wall):
         self.walls.append(wall)
@@ -109,7 +114,7 @@ class Floor:
                     return
                 if value == 1:
                     self.add_wall(Wall(self.game, lx, ly, gx, gy))
-                elif value == "f":
+                elif value == FIRE:
                     self.add_inter(BurningPile(self.game, lx, ly, gx, gy))
                 elif fl[gx][gy] == 0:
                     self.clear_space(lx, ly)

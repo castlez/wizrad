@@ -1,5 +1,6 @@
 import pygame as pg
 from settings import *
+import os
 import traceback
 
 class Player(pg.sprite.Sprite):
@@ -8,6 +9,11 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.fill(YELLOW)
+        # self.image = pg.image.load(os.path.join("assets", "wiz_up.png"))
+        # self.image = pg.transform.scale(self.image, (TILESIZE, TILESIZE))
+        # TODO: use rotozoom to rotate 
+        # self.image = pg.Surface(self.image.get_size()).convert_alpha()
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
 
@@ -56,19 +62,22 @@ class Player(pg.sprite.Sprite):
     
     def inspect_space(self, mouse_pos):
         message = ""
+        x = -1
+        y = -1
         for sprite in self.game.all_sprites:
             try:
                 if sprite.rect.collidepoint(mouse_pos):
                     message = sprite.inspect()
+                    x = sprite.gx
+                    y = sprite.gy
                     break
             except Exception as e:
                 self.game.log.info(e)
                 continue
-        if message != "" and message != None:
-            self.game.log.info(message)
-        else:
-            self.game.log.info("Its the floor. Im looking at the floor... "
-                               "Maybe i should look at other things")
+        if message == "" or message == None:
+            message = "Its the floor. Im looking at the floor... "\
+                      "Maybe i should look at other things"
+        self.game.log.info(message + f" (x,y) = ({mouse_pos})")
 
     def interact_space(self, mouse_pos):        
         message = ""
@@ -80,11 +89,10 @@ class Player(pg.sprite.Sprite):
             except Exception as e:
                 self.game.log.info(e)
                 continue
-        if message != "" and message != None:
-            self.game.log.info(message)
-        else:
-            self.game.log.info("Its the floor. Im looking at the floor... "
-                            "Maybe i should look at other things")
+        if message == "" and message == None:
+            message = "Its the floor. Im looking at the floor... "\
+                      "Maybe i should look at other things"
+        self.game.log.info(message)
     
     def has_element(self, element):
         has_ele = False
@@ -99,10 +107,9 @@ class Player(pg.sprite.Sprite):
     def add_spell(self, spell):
         self.spells.append(spell)
         if self.equipped_spell == None:
-                self.equipped_spell = spell(self.game)
+                self.equipped_spell = spell
     
     def fire_spell(self, mouse_pos):
         if self.equipped_spell:
             self.is_firing = True
-            self.equipped_spell.rect.x = mouse_pos[0]
-            self.equipped_spell.rect.y = mouse_pos[1]
+            self.equipped_spell(self.game, mouse_pos)
