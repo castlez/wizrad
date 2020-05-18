@@ -70,6 +70,21 @@ class Floor:
         print("removing enemy")
         self.enemies.remove(enemy)
         enemy.kill()
+
+    def get_local_pos(self, gx, gy):
+        xmin = self.current_view[0][0]
+        xmax = self.current_view[0][1]
+        ymin = self.current_view[1][0]
+        ymax = self.current_view[1][1]
+
+        if gx < xmin or gx > xmax or gy < ymin or gy > ymax:
+            print("bout")
+            return None
+        
+        lx = gx - xmin
+        ly = gy - ymin
+        print(f"pile x,y = {lx}, {ly}")
+        return lx, ly
     
     def purge_unseen(self):
         xmin = self.current_view[0][0]
@@ -85,9 +100,8 @@ class Floor:
         
         # interactable objects
         for i, inter in enumerate(self.inters):
-            if inter.x < xmin or inter.x > xmax or inter.y < ymin or inter.y > ymax:
-                inter.kill()
-                del self.inters[i]
+            if inter.gx < xmin or inter.gx > xmax or inter.gy < ymin or inter.gy > ymax:
+                inter.visible = False
         
         # enemies TODO improve this system
         for i, enemy in enumerate(self.enemies):
@@ -106,6 +120,7 @@ class Floor:
         # update the current view and purge anything
         # no longer visible
         self.current_view = [[xmin, xmax], [ymin, ymax]]
+        print(f"view: {self.current_view}")
         self.purge_unseen()
 
         # get ranges for viewport and the corresponding area

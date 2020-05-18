@@ -72,9 +72,32 @@ class BurningPile(WSPRITE):
         self.inspect_message = "A magic fire, i better watch out. Hmm.. "\
                                "its interesting (right click to study)"
         self.name = "BurningPile"
+        self.visible = True
+        self.start_pos = (gx, gy)
+        self.set_sign(FIRE + SPAWNED)
+        
     
     def update(self):
-        super().update()
+        print(f"update vis = {self.visible}")
+        if self.visible:
+            try:
+                print(f"gx,gy = {self.gx}, {self.gy}")
+                x, y = self.get_local_pos() 
+                print(f"{x}, {y}")
+                self.x = x - self.game.player.dx
+                self.y = y - self.game.player.dy
+            except Exception as e:
+                print(e)
+            self.rect.x = self.x * TILESIZE
+            self.rect.y = self.y * TILESIZE
+    
+    def get_local_pos(self):
+        return self.game.current_floor.get_local_pos(self.gx, self.gy)
+    
+    def draw(self, screen):
+        print(f"draw vis = {self.visible}")
+        if self.visible:
+            screen.blit(self.rect, (self.rect.x, self.rect.y))
     
     def interact(self, player):
         if player.has_element("fire"):
@@ -82,6 +105,9 @@ class BurningPile(WSPRITE):
         else:
             player.add_spell(Fire)
             return "I studied the pile and learned the secrets of fire magic!"
+
+    def set_sign(self, sign):
+        self.game.current_floor.layout[self.start_pos[0]][self.start_pos[1]] = sign
 
 class Skeleton(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
@@ -140,7 +166,6 @@ class Skeleton(WSPRITE):
 
         return newx == px and newy == py
 
-
     def update(self):
         if self.visible:
             # check if we have los on the player and move if we do
@@ -186,7 +211,7 @@ class Skeleton(WSPRITE):
 
     def draw(self, screen):
         if self.visible:
-            screen.blit(self.rect, (self.x, self.y))
+            screen.blit(self.rect, (self.rect.x, self.rect.y))
 
     def set_sign(self, sign):
         self.game.current_floor.layout[self.start_pos[0]][self.start_pos[1]] = sign
