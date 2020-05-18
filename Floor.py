@@ -53,9 +53,6 @@ class Floor:
         for inter in self.inters:
             if inter.x == x and inter.y == y:
                 inter.kill()
-        # for enemy in self.enemies:
-        #     if enemy.x == x and enemy.y == y:
-        #         enemy.kill()
 
     def add_wall(self, wall):
         self.walls.append(wall)
@@ -68,8 +65,8 @@ class Floor:
     
     def remove_enemy(self, enemy):
         print("removing enemy")
-        self.enemies.remove(enemy)
-        enemy.kill()
+        self.enemies[enemy].kill()
+        del self.enemies[enemy]
 
     def get_local_pos(self, gx, gy):
         xmin = self.current_view[0][0]
@@ -105,7 +102,7 @@ class Floor:
         # enemies TODO improve this system
         for i, enemy in enumerate(self.enemies):
             if enemy.health < 0:
-                self.remove_enemy(enemy)
+                self.remove_enemy(i)
             elif enemy.gx < xmin or enemy.gx > xmax or enemy.gy < ymin or enemy.gy > ymax:
                 enemy.visible = False
         

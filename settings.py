@@ -58,6 +58,9 @@ FIRING_SPEED = 15
 # it tries to hit things
 SPELL_BUFFER = 0
 
+SPELL_SIZE = int(TILESIZE/2)
+
+
 # Fire
 FIRE = "f"
 FMIN = 20

@@ -12,7 +12,8 @@ class WSPELL(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.spells
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = pg.Surface((SPELL_SIZE, SPELL_SIZE))
+        # self.image = pg.transform.rotozoom(self.image, 0, 0.5)
         self.image.fill(color)
         self.rect = self.image.get_rect()
 
@@ -34,9 +35,7 @@ class WSPELL(pg.sprite.Sprite):
         # shooting
         self.vel = None
         self.shot_start = None
-        self.rect.x = self.x * TILESIZE
-        self.rect.y = self.y * TILESIZE
-
+        
         # determine the shot directions, 
         # first get mouse position in tiles
         # then normalize to -1, 0, 1 for x and y
@@ -44,6 +43,10 @@ class WSPELL(pg.sprite.Sprite):
         my = int(mouse_pos[1]/TILESIZE)
         dx, dy = self.normalize_quards(mx, my)
         self.target_pos = [dx, dy]
+        self.rect.x = self.x * TILESIZE
+        self.rect.y = self.y * TILESIZE
+
+        # self.check_hit()
         
         # time tracking to change spell speed
         self.cur_interval = time.time()
@@ -76,9 +79,7 @@ class WSPELL(pg.sprite.Sprite):
     def __str__(self):
         return self.name
     
-    def update(self):
-        # first check if the player moved
-        # and adjust for the new viewport
+    def get_next_dx(self):
         dx = self.game.player.dx
         dy = self.game.player.dy
         tx = self.target_pos[0]
@@ -86,31 +87,44 @@ class WSPELL(pg.sprite.Sprite):
         tx -= dx
         ty -= dy
 
+        return tx, ty
+    
+    def update(self):
+        # first check if the player moved
+        # and adjust for the new viewport
+        tx, ty = self.get_next_dx()
+
         # update the global position and ensure we're still in view
-        self.gx += self.target_pos[0]
-        self.gy += self.target_pos[1]
+        # self.gx += self.target_pos[0]
+        # self.gy += self.target_pos[1]
+        self.gx += tx
+        self.gy += ty
         if not self.game.object_in_view(self.gx, self.gy):
             super().kill()
             self.game.player.is_firing = False
         else:
-            # update rect location
+            # update loc
+            # x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+            self.x += tx
+            self.y += ty
             self.rect.x += tx * TILESIZE
             self.rect.y += ty * TILESIZE
             # check if you hit something
-            if self.moved > SPELL_BUFFER:
-                hit_something = False
-                for sprite in self.game.all_sprites:
-                        try:
-                            hit_something = self.hit(sprite)
-                            if hit_something:
-                                break
-                        except:
-                            pass
-                if hit_something:
-                    super().kill()
-                    self.game.player.is_firing = False
-            else:
-                self.moved += 1
+            self.check_hit()
+    
+    def draw(self, screen):
+        print(f"|{self.rect.x},{self.rect.y}|{SPELL_SIZE}|{self.rect.x + SPELL_SIZE}")
+        draw_x = self.rect.x
+        draw_y = self.rect.y + int(SPELL_SIZE/4)
+        screen.blit(self.rect, (draw_x, draw_y))
+    
+    def check_hit(self):
+        for sprite in self.game.all_sprites:
+            try:
+                if sprite.x == self.x and sprite.y == self.y and sprite != self:
+                    self.hit(sprite)
+            except:
+                pass
 
     def inspect(self):
         return self.inspect_message
@@ -142,7 +156,7 @@ class Fire(WSPELL):
     
     def hit(self, target):
         try:
-            if self.rect.collidepoint(target.rect.center):
+            if self.rect.colliderect(target.rect):
                 target.take_damage(random.randint(FDAMAGE_RANGE[0], FDAMAGE_RANGE[1]))
                 super().kill()
                 return True

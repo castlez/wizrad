@@ -122,6 +122,10 @@ class Skeleton(WSPRITE):
         self.skip = False  # skip a tick after hitting the player
     
     def get_next_space(self):
+        """
+        TODO make this actually return a space 
+        AND NOT A FUCKING DX, DY, or change the name
+        """
         # Find direction vector (dx, dy) between enemy and player.
         dx, dy = self.game.player.x - self.x, self.game.player.y - self.y
         dist = math.hypot(dx, dy)
@@ -151,6 +155,9 @@ class Skeleton(WSPRITE):
                         if sprite.name == "Player":
                             print("see player!")
                             return True
+                        elif sprite.name == "Wall":
+                            print("no los")
+                            return False
             except Exception as e:
                 print(e)
                 continue
@@ -188,11 +195,10 @@ class Skeleton(WSPRITE):
             # then we check if we are already next to the player
             # and if not, we move
             if not blocked and see_player and not self.skip:
-                if self.adjacent_to_player(newx, newy):
-                    print("on player")
-                else:
+                if not self.adjacent_to_player(newx, newy):
                     self.gx += cx
                     self.gy += cy
+
                     x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
                     self.x = x
                     self.y = y
@@ -201,7 +207,6 @@ class Skeleton(WSPRITE):
                 self.x -= self.game.player.dx
                 self.y -= self.game.player.dy
                 self.skip = False
-            print(f"new skele pos: {self.x},{self.y}")
             self.rect.x = self.x * TILESIZE
             self.rect.y = self.y * TILESIZE
 
@@ -223,10 +228,8 @@ class Skeleton(WSPRITE):
     def hit(self, target):
         # can only hurt the player
         if target.name == "Player":
-            print("HIT PLAYER")
             self.skip = True
             dmg = random.randint(SKDAMAGE_RANGE[0], SKDAMAGE_RANGE[1])
-            print(f"skele hit for {dmg} damage")
             target.take_damage(dmg)
             
     

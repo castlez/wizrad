@@ -56,6 +56,9 @@ class Game:
         gx, gy = self.current_floor.get_valid_pos()
         self.player.update_global_position(gx, gy)
 
+        # start the engines
+        self.tick = True
+
         # TODO remove
         self.save_map()
 
@@ -95,7 +98,6 @@ class Game:
     def quit(self, save_map=False):
         if save_map:
             self.save_map()
-        
         pg.quit()
         sys.exit()
 
@@ -176,9 +178,10 @@ class Game:
                 if event.key == pg.K_e:
                     self.log.info(f"current equipped spell: {self.player.equipped_spell}")
                 if event.key == pg.K_SPACE:
-                    if not self.player.is_firing:
-                        mouse_pos = pg.mouse.get_pos()
-                        self.player.fire_spell(mouse_pos)
+                    # if not self.player.is_firing: TODO maybe limit this?
+                    self.tick = True
+                    mouse_pos = pg.mouse.get_pos()
+                    self.player.fire_spell(mouse_pos)
                 if event.key == pg.K_RETURN:
                     self.tick = True
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
@@ -207,10 +210,10 @@ class Game:
         cur_g_y = self.player.gy
 
         # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
-        xmin = cur_g_x - 6 -1
-        xmax = cur_g_x + 10 + 1
-        ymin = cur_g_y - 6 - 1
-        ymax = cur_g_y + 10 + 1
+        xmin = cur_g_x - 6
+        xmax = cur_g_x + 10
+        ymin = cur_g_y - 6 
+        ymax = cur_g_y + 10 
 
         # if we are out of sight, despawn
         if gx < xmin or gx > xmax or gy < ymin or gy > ymax:
