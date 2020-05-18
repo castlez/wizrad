@@ -78,12 +78,9 @@ class BurningPile(WSPRITE):
         
     
     def update(self):
-        print(f"update vis = {self.visible}")
         if self.visible:
             try:
-                print(f"gx,gy = {self.gx}, {self.gy}")
                 x, y = self.get_local_pos() 
-                print(f"{x}, {y}")
                 self.x = x - self.game.player.dx
                 self.y = y - self.game.player.dy
             except Exception as e:
@@ -95,7 +92,6 @@ class BurningPile(WSPRITE):
         return self.game.current_floor.get_local_pos(self.gx, self.gy)
     
     def draw(self, screen):
-        print(f"draw vis = {self.visible}")
         if self.visible:
             screen.blit(self.rect, (self.rect.x, self.rect.y))
     
@@ -125,9 +121,9 @@ class Skeleton(WSPRITE):
         # exp
         self.skip = False  # skip a tick after hitting the player
     
-    def get_next_space(self, x, y):
+    def get_next_space(self):
         # Find direction vector (dx, dy) between enemy and player.
-        dx, dy = self.game.player.rect.x - self.rect.x, self.game.player.rect.y - self.rect.y
+        dx, dy = self.game.player.x - self.x, self.game.player.y - self.y
         dist = math.hypot(dx, dy)
         if dist == 0:
             # dont need to move if already munching on player
@@ -146,7 +142,7 @@ class Skeleton(WSPRITE):
         y = self.y
         
         while x in range(0, GRIDWIDTH) and y in range(0, GRIDHEIGHT):
-            dx, dy = self.get_next_space(x, y)
+            dx, dy = self.get_next_space()
             x += dx
             y += dy
             try:
@@ -172,7 +168,7 @@ class Skeleton(WSPRITE):
             see_player = False
             if self.check_player_los():
                 see_player = True
-            cx, cy = self.get_next_space(self.x, self.y)
+            cx, cy = self.get_next_space()
             newx = self.x + cx 
             newy = self.y + cy
             # check collisions
@@ -195,16 +191,17 @@ class Skeleton(WSPRITE):
                 if self.adjacent_to_player(newx, newy):
                     print("on player")
                 else:
-                    self.y = newx
-                    self.x = newy
-                    self.gx += cy
-                    self.gy += cx
+                    self.gx += cx
+                    self.gy += cy
+                    x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+                    self.x = x
+                    self.y = y
             else:
                 # just adjust for viewpoint movement
                 self.x -= self.game.player.dx
                 self.y -= self.game.player.dy
                 self.skip = False
-                    
+            print(f"new skele pos: {self.x},{self.y}")
             self.rect.x = self.x * TILESIZE
             self.rect.y = self.y * TILESIZE
 

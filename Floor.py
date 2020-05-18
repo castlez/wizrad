@@ -83,7 +83,6 @@ class Floor:
         
         lx = gx - xmin
         ly = gy - ymin
-        print(f"pile x,y = {lx}, {ly}")
         return lx, ly
     
     def purge_unseen(self):
