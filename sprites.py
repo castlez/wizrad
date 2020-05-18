@@ -60,7 +60,6 @@ class Wall(WSPRITE):
         super().update()
     
     def take_damage(self, amount):
-        print("wall hit")
         self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
 
 class BurningPile(WSPRITE):
@@ -153,10 +152,8 @@ class Skeleton(WSPRITE):
                 for sprite in self.game.all_sprites:
                     if sprite.x == x and sprite.y == y and sprite != self:
                         if sprite.name == "Player":
-                            print("see player!")
                             return True
                         elif sprite.name == "Wall":
-                            print("no los")
                             return False
             except Exception as e:
                 print(e)
@@ -212,6 +209,7 @@ class Skeleton(WSPRITE):
 
 
     def draw(self, screen):
+        print("drawing skele")
         if self.visible:
             screen.blit(self.rect, (self.rect.x, self.rect.y))
 

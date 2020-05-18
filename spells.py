@@ -35,6 +35,7 @@ class WSPELL(pg.sprite.Sprite):
         # shooting
         self.vel = None
         self.shot_start = None
+        self.active = True
         
         # determine the shot directions, 
         # first get mouse position in tiles
@@ -43,8 +44,8 @@ class WSPELL(pg.sprite.Sprite):
         my = int(mouse_pos[1]/TILESIZE)
         dx, dy = self.normalize_quards(mx, my)
         self.target_pos = [dx, dy]
-        self.rect.x = self.x * TILESIZE
-        self.rect.y = self.y * TILESIZE
+        self.rect.x = SPELL_SIZE/2 + self.x * TILESIZE
+        self.rect.y = SPELL_SIZE/2 + self.y * TILESIZE
 
         # self.check_hit()
         
@@ -90,39 +91,36 @@ class WSPELL(pg.sprite.Sprite):
         return tx, ty
     
     def update(self):
-        # first check if the player moved
-        # and adjust for the new viewport
-        tx, ty = self.get_next_dx()
+        if self.active:
+            # first check if the player moved
+            # and adjust for the new viewport
+            tx, ty = self.get_next_dx()
 
-        # update the global position and ensure we're still in view
-        # self.gx += self.target_pos[0]
-        # self.gy += self.target_pos[1]
-        self.gx += tx
-        self.gy += ty
-        if not self.game.object_in_view(self.gx, self.gy):
-            super().kill()
-            self.game.player.is_firing = False
-        else:
-            # update loc
-            # x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
-            self.x += tx
-            self.y += ty
-            self.rect.x += tx * TILESIZE
-            self.rect.y += ty * TILESIZE
-            # check if you hit something
-            self.check_hit()
-    
-    def draw(self, screen):
-        print(f"|{self.rect.x},{self.rect.y}|{SPELL_SIZE}|{self.rect.x + SPELL_SIZE}")
-        draw_x = self.rect.x
-        draw_y = self.rect.y + int(SPELL_SIZE/4)
-        screen.blit(self.rect, (draw_x, draw_y))
+            # update the global position and ensure we're still in view
+            # self.gx += self.target_pos[0]
+            # self.gy += self.target_pos[1]
+            self.gx += tx
+            self.gy += ty
+            if not self.game.object_in_view(self.gx, self.gy):
+                self.active = False
+                self.game.player.is_firing = False
+            else:
+                # update loc
+                # x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+                self.x += tx
+                self.y += ty
+                self.rect.x += tx * TILESIZE
+                self.rect.y += ty * TILESIZE
+                # check if you hit something
+                self.check_hit()
     
     def check_hit(self):
         for sprite in self.game.all_sprites:
             try:
                 if sprite.x == self.x and sprite.y == self.y and sprite != self:
                     self.hit(sprite)
+                    self.active = False
+                    return
             except:
                 pass
 
@@ -144,6 +142,11 @@ class WSPELL(pg.sprite.Sprite):
         print("WRONG ONE")
         return False
     
+    def draw(self, screen):
+        """
+        """
+        print("BAD")
+    
     def kill(self):
         super().kill()
 
@@ -155,15 +158,21 @@ class Fire(WSPELL):
         self.inspect_message = "a Fire Ball spell"
     
     def hit(self, target):
-        try:
-            if self.rect.colliderect(target.rect):
-                target.take_damage(random.randint(FDAMAGE_RANGE[0], FDAMAGE_RANGE[1]))
-                super().kill()
-                return True
-        except Exception as e:
-            print(e)
-            
-        return False
+        target.take_damage(random.randint(FDAMAGE_RANGE[0], FDAMAGE_RANGE[1]))
+        self.active = False
+    
+    # TODO not getting called?
+    def draw(self, screen):
+        print("dr")
+        if self.active:
+            try:
+                print(f"|{self.rect.x},{self.rect.y}|{SPELL_SIZE}|{self.rect.x + SPELL_SIZE}")
+            except Exception as e:
+                print(e)
+            draw_x = self.rect.x
+            draw_y = self.rect.y + SPELL_SIZE/2
+            screen.blit(self.rect, (draw_x, draw_y))
+    
 
 
 

@@ -35,8 +35,10 @@ class Player(pg.sprite.Sprite):
 
         # game statue
         self.spells = []
+        self.active_spells = []
         self.equipped_spell = None
         self.is_firing = False
+
     
     def take_damage(self, amount):
         self.state.health -= amount
@@ -61,8 +63,15 @@ class Player(pg.sprite.Sprite):
             self.still = False
 
     def update(self):
+        self.check_spells()
         self.rect.x = self.x * TILESIZE
         self.rect.y = self.y * TILESIZE
+    
+    def check_spells(self):
+        for i, spell in enumerate(self.active_spells):
+            if not spell.active:
+                spell.kill()
+                del self.active_spells[i]
     
     def is_moving(self):
         return self.dx != 0 and self.dy != 0
@@ -130,7 +139,8 @@ class Player(pg.sprite.Sprite):
     def fire_spell(self, mouse_pos):
         if self.equipped_spell:
             self.is_firing = True
-            self.equipped_spell(self.game, mouse_pos)
+            spell = self.equipped_spell(self.game, mouse_pos)
+            self.active_spells.append(spell)
 
 class PlayerState:
     health = PLAYER_START_HEALTH

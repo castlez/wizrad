@@ -75,7 +75,6 @@ class Floor:
         ymax = self.current_view[1][1]
 
         if gx < xmin or gx > xmax or gy < ymin or gy > ymax:
-            print("bout")
             return None
         
         lx = gx - xmin
@@ -116,7 +115,6 @@ class Floor:
         # update the current view and purge anything
         # no longer visible
         self.current_view = [[xmin, xmax], [ymin, ymax]]
-        print(f"view: {self.current_view}")
         self.purge_unseen()
 
         # get ranges for viewport and the corresponding area
@@ -141,10 +139,8 @@ class Floor:
                 elif value == FIRE:
                     self.add_inter(BurningPile(self.game, lx, ly, gx, gy))
                 elif value == SKELETON:
-                    print("created skele")
                     sk = Skeleton(self.game, lx, ly, gx, gy)
                     self.add_enemy(sk)
-                    print(f"new sign: {self.layout[gx][gy]}")
                 else:
                     try:
                         sprite_at = self.game.get_sprite_at(lx, ly)

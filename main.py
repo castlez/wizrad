@@ -107,8 +107,7 @@ class Game:
         if not self.player.still:
             self.tick = True
         
-        if self.tick:
-            print("------------- Tick Start ---------------")
+        if self.tick:  # NOTE: might be able to toggle turn based here... 
             # use the global position of the player to decide what to draw
             cur_g_x = self.player.gx
             cur_g_y = self.player.gy
@@ -120,7 +119,6 @@ class Game:
             self.tick = False
             self.player.dx = 0
             self.player.dy = 0
-            print("------------- Tick End -----------------")
         self.log.update()
 
         if not self.player.state.alive:
@@ -138,9 +136,9 @@ class Game:
         if self.show_grid:
             self.draw_grid()
         self.walls.draw(self.screen)
-        self.spells.draw(self.screen)
         self.enemies.draw(self.screen)
         self.inters.draw(self.screen)
+        self.spells.draw(self.screen)
         self.playerg.draw(self.screen)
         self.log.draw(self.screen)
         pg.display.flip()
