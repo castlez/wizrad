@@ -95,6 +95,9 @@ class Skeleton(WSPRITE):
         self.inspect_message = f"An animated skeleton. A good fireball should do the trick."
         self.blocking = True
         self.visible = True
+
+        # exp
+        self.skip = False  # skip a tick after hitting the player
     
     def get_next_space(self, x, y):
         # Find direction vector (dx, dy) between enemy and player.
@@ -112,10 +115,11 @@ class Skeleton(WSPRITE):
 
         return cx, cy
     
-    def check_los(self):
+    def check_player_los(self):
         x = self.x
         y = self.y
-        while True:
+        
+        while x in range(0, GRIDWIDTH) and y in range(0, GRIDHEIGHT):
             dx, dy = self.get_next_space(x, y)
             x += dx
             y += dy
@@ -123,48 +127,59 @@ class Skeleton(WSPRITE):
                 for sprite in self.game.all_sprites:
                     if sprite.x == x and sprite.y == y and sprite != self:
                         if sprite.name == "Player":
-                            print("have los on player")
+                            print("see player!")
                             return True
             except Exception as e:
                 print(e)
-            return False
+                continue
+        return False
+    
+    def adjacent_to_player(self, newx, newy):
+        px = self.game.player.x
+        py = self.game.player.y
+
+        return newx == px and newy == py
+
 
     def update(self):
         if self.visible:
             # check if we have los on the player and move if we do
             see_player = False
-            if self.check_los():
+            if self.check_player_los():
                 see_player = True
             cx, cy = self.get_next_space(self.x, self.y)
             newx = self.x + cx 
             newy = self.y + cy
             # check collisions
             blocked = False
+            hit_sprite = None
             for sprite in self.game.all_sprites:
                 try:
                     if sprite.x == newx and sprite.y == newy and sprite != self:
                         self.hit(sprite)
                         if sprite.blocking:
-                            print(f"blocked by {sprite} ({sprite.x},{sprite.y})")
-                            print(f"while at ({self.x}, {self.y})")
                             # if it collides with a sprite and it isnt itself, block
                             blocked = True
                 except:
                     pass
 
-            # if we have a clear path, move
-            # if our next pos is players pos, move away
-            if not blocked and see_player:
-                self.x += cx
-                self.y += cy
-                self.gx += cx
-                self.gy += cy
-            else:
-                if newx == self.game.player.x and newy == self.game.player.y:
-                    pass
+            # if we are unblocked and can see the player
+            # then we check if we are already next to the player
+            # and if not, we move
+            if not blocked and see_player and not self.skip:
+                if self.adjacent_to_player(newx, newy):
+                    print("on player")
                 else:
-                    self.x -= self.game.player.dx
-                    self.y -= self.game.player.dy
+                    self.y = newx
+                    self.x = newy
+                    self.gx += cy
+                    self.gy += cx
+            else:
+                # just adjust for viewpoint movement
+                self.x -= self.game.player.dx
+                self.y -= self.game.player.dy
+                self.skip = False
+                    
             self.rect.x = self.x * TILESIZE
             self.rect.y = self.y * TILESIZE
 
@@ -185,9 +200,9 @@ class Skeleton(WSPRITE):
     
     def hit(self, target):
         # can only hurt the player
-        print(f"trying to hit {target}")
         if target.name == "Player":
             print("HIT PLAYER")
+            self.skip = True
             dmg = random.randint(SKDAMAGE_RANGE[0], SKDAMAGE_RANGE[1])
             print(f"skele hit for {dmg} damage")
             target.take_damage(dmg)

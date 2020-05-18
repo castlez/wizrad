@@ -64,6 +64,9 @@ class Player(pg.sprite.Sprite):
         self.rect.x = self.x * TILESIZE
         self.rect.y = self.y * TILESIZE
     
+    def is_moving(self):
+        return self.dx != 0 and self.dy != 0
+    
     def check_collision(self, dx, dy):
         new_x = self.x + dx
         new_y = self.y + dy

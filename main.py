@@ -106,6 +106,7 @@ class Game:
             self.tick = True
         
         if self.tick:
+            print("------------- Tick Start ---------------")
             # use the global position of the player to decide what to draw
             cur_g_x = self.player.gx
             cur_g_y = self.player.gy
@@ -117,10 +118,12 @@ class Game:
             self.tick = False
             self.player.dx = 0
             self.player.dy = 0
+            print("------------- Tick End -----------------")
         self.log.update()
 
         if not self.player.state.alive:
             self.playing = False
+        
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
