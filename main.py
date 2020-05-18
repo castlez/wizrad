@@ -44,10 +44,9 @@ class Game:
         self.enemies = pg.sprite.Group()
         self.inters = pg.sprite.Group()
         self.spells = pg.sprite.Group()
+        self.playerg = pg.sprite.Group()
         self.player = Player(self, 8, 8)
         self.log = LogWindow(self, 3, 15)
-
-
 
         # first floor (TODO start screen)
         self.current_floor = Floor(self, 1)
@@ -111,9 +110,9 @@ class Game:
             cur_g_x = self.player.gx
             cur_g_y = self.player.gy
 
-            self.current_floor.update_viewport(cur_g_x, cur_g_y)
+            self.playerg.update()
             self.all_sprites.update()
-            self.spells.update()    
+            self.current_floor.update_viewport(cur_g_x, cur_g_y)
             self.player.still = True
             self.tick = False
             self.player.dx = 0
@@ -133,9 +132,11 @@ class Game:
         self.screen.fill(BGCOLOR)
         if self.show_grid:
             self.draw_grid()
-        self.all_sprites.draw(self.screen)
-        # if self.player.is_firing:
+        self.walls.draw(self.screen)
         self.spells.draw(self.screen)
+        self.enemies.draw(self.screen)
+        self.inters.draw(self.screen)
+        self.playerg.draw(self.screen)
         self.log.draw(self.screen)
         pg.display.flip()
 
@@ -184,6 +185,15 @@ class Game:
             elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
                 mouse_pos = pg.mouse.get_pos()
                 self.player.interact_space(mouse_pos)
+
+    def get_sprite_at(self, x, y):
+        for sprite in self.all_sprites:
+            try:
+                if sprite.x == x and sprite.y == y:
+                    return sprite
+            except:
+                pass
+        return None
     
     def object_in_view(self, gx, gy):
         """
@@ -194,10 +204,10 @@ class Game:
         cur_g_y = self.player.gy
 
         # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
-        xmin = cur_g_x - 6
-        xmax = cur_g_x + 10
-        ymin = cur_g_y - 6
-        ymax = cur_g_y + 10
+        xmin = cur_g_x - 6 -1
+        xmax = cur_g_x + 10 + 1
+        ymin = cur_g_y - 6 - 1
+        ymax = cur_g_y + 10 + 1
 
         # if we are out of sight, despawn
         if gx < xmin or gx > xmax or gy < ymin or gy > ymax:

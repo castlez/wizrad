@@ -1,3 +1,4 @@
+import random
 import pygame as pg
 from settings import *
 import time
@@ -8,7 +9,7 @@ class WSPELL(pg.sprite.Sprite):
     """
     name = "NAMELESS"
     def __init__(self, game, mouse_pos, color=GREEN):
-        self.groups = game.spells
+        self.groups = game.all_sprites, game.spells
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
@@ -142,7 +143,7 @@ class Fire(WSPELL):
     def hit(self, target):
         try:
             if self.rect.collidepoint(target.rect.center):
-                target.take_damage(FIRE_DAMAGE)
+                target.take_damage(random.randint(FDAMAGE_RANGE[0], FDAMAGE_RANGE[1]))
                 super().kill()
                 return True
         except Exception as e:

@@ -8,10 +8,13 @@ class LogWindow(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.inspect_message = "Thats my recent thoughts (scroll with arrow keys)"
+        self.name = "LogWindow"
 
         # position should be fixed at the bottom
         self.image = pg.Surface((WIDTH, HEIGHT))
         self.image.fill(BLACK)
+        self.x = x
+        self.y = y
         self.rect = self.image.get_rect()
         self.rect.x = x * TILESIZE * 8
         self.rect.y = y * TILESIZE * 2

@@ -62,13 +62,19 @@ SPELL_BUFFER = 0
 FIRE = "f"
 FMIN = 20
 FMAX = 30
-FIRE_DAMAGE = 5
+FDAMAGE_RANGE = [0, 5]
 
 ###### Enemies ######
 
+# modifiers for map tracking
+# no mods means the enemy is unspawned
+SPAWNED = "sp"
+DEAD = "x"
+
 # Skeletons
 SKELETON = "sk"
+SPAWNED
 SKMIN = 20
 SKMAX = 30
 SKLIFE = 5
-SKDAMAGE = 10
+SKDAMAGE_RANGE = [2, 4]

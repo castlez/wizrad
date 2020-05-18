@@ -5,7 +5,8 @@ import traceback
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites, game.playerg
+        # self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
@@ -17,6 +18,7 @@ class Player(pg.sprite.Sprite):
         self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.state = PlayerState()
+        self.name = "Player"
 
         # position on the screen with current change
         self.x = x
@@ -66,10 +68,12 @@ class Player(pg.sprite.Sprite):
         new_x = self.x + dx
         new_y = self.y + dy
         blocked = False
-        for wall in self.game.walls:
-            if new_x == wall.x and new_y == wall.y and self.collisions:
+        for sprite in self.game.all_sprites:
+            if new_x == sprite.x and new_y == sprite.y and sprite.blocking:
                 blocked = True
-        return blocked
+        # blocked if we hit something and collisions are on
+        is_blocked = blocked and self.collisions
+        return is_blocked
     
     def inspect_space(self, mouse_pos):
         message = ""
@@ -88,7 +92,7 @@ class Player(pg.sprite.Sprite):
         if message == "" or message == None:
             message = "Its the floor. Im looking at the floor... "\
                       "Maybe i should look at other things"
-        self.game.log.info(message + f" (x,y) = ({mouse_pos})")
+        self.game.log.info(message)
 
     def interact_space(self, mouse_pos):        
         message = ""
