@@ -40,6 +40,7 @@ class LogWindow(pg.sprite.Sprite):
         self.current_place += change
     
     def info(self, message):
+        print(message)
         self.log.append(f"i:{message}")
     
     def update(self):

@@ -45,6 +45,9 @@ class WSPRITE(pg.sprite.Sprite):
     
     def kill(self):
         super().kill()
+    
+    def drawt(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
 
 class Wall(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
@@ -91,6 +94,7 @@ class BurningPile(WSPRITE):
         return self.game.current_floor.get_local_pos(self.gx, self.gy)
     
     def draw(self, screen):
+        print("bp draw")
         if self.visible:
             screen.blit(self.rect, (self.rect.x, self.rect.y))
     
@@ -153,6 +157,8 @@ class Skeleton(WSPRITE):
                     if sprite.x == x and sprite.y == y and sprite != self:
                         if sprite.name == "Player":
                             return True
+                        elif self.adjacent_to_player(x, y):
+                            return True
                         elif sprite.name == "Wall":
                             return False
             except Exception as e:
@@ -207,7 +213,6 @@ class Skeleton(WSPRITE):
             self.rect.x = self.x * TILESIZE
             self.rect.y = self.y * TILESIZE
 
-
     def draw(self, screen):
         print("drawing skele")
         if self.visible:
@@ -218,9 +223,9 @@ class Skeleton(WSPRITE):
     
     def take_damage(self, amount):
         self.health = self.health - amount
-        self.game.log.info(f"I hit the skeleton for {amount} damage! ({self.health} hp)")
+        self.game.log.info(f"XXXXXXX I hit the skeleton for {amount} damage! ({self.health} hp)")
         if self.health <= 0:
-            self.game.log.info("...and it killed it!")
+            self.game.log.info("XXXXXXX ...and it killed it!")
             self.set_sign(SKELETON + DEAD)
     
     def hit(self, target):
@@ -228,7 +233,7 @@ class Skeleton(WSPRITE):
         if target.name == "Player":
             self.skip = True
             dmg = random.randint(SKDAMAGE_RANGE[0], SKDAMAGE_RANGE[1])
-            target.take_damage(dmg)
+            target.take_damage(self, dmg)
             
     
     def interact(self, player):

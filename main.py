@@ -112,8 +112,8 @@ class Game:
             cur_g_x = self.player.gx
             cur_g_y = self.player.gy
 
-            self.playerg.update()
             self.all_sprites.update()
+            self.playerg.update()
             self.current_floor.update_viewport(cur_g_x, cur_g_y)
             self.player.still = True
             self.tick = False
@@ -135,11 +135,15 @@ class Game:
         self.screen.fill(BGCOLOR)
         if self.show_grid:
             self.draw_grid()
-        self.walls.draw(self.screen)
-        self.enemies.draw(self.screen)
-        self.inters.draw(self.screen)
-        self.spells.draw(self.screen)
-        self.playerg.draw(self.screen)
+        for wall in self.walls:
+            wall.drawt(self.screen)
+        for enemy in self.enemies:
+            enemy.drawt(self.screen)
+        for inter in self.inters:
+            inter.drawt(self.screen)
+        for spell in self.spells:
+            spell.drawt(self.screen)
+        self.player.drawt(self.screen)
         self.log.draw(self.screen)
         pg.display.flip()
 

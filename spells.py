@@ -13,13 +13,16 @@ class WSPELL(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((SPELL_SIZE, SPELL_SIZE))
-        # self.image = pg.transform.rotozoom(self.image, 0, 0.5)
+        self.image = pg.transform.rotate(self.image, 0.45)
         self.image.fill(color)
         self.rect = self.image.get_rect()
+        self.blocking = False
 
         # hide the spell under the player
         self.x = game.player.x
         self.y = game.player.y
+        self.lastx = self.x
+        self.lasty = self.y
         self.pos = pg.math.Vector2(self.x, self.y)
 
         self.gx = game.player.gx
@@ -47,8 +50,6 @@ class WSPELL(pg.sprite.Sprite):
         self.rect.x = SPELL_SIZE/2 + self.x * TILESIZE
         self.rect.y = SPELL_SIZE/2 + self.y * TILESIZE
 
-        # self.check_hit()
-        
         # time tracking to change spell speed
         self.cur_interval = time.time()
     
@@ -107,6 +108,8 @@ class WSPELL(pg.sprite.Sprite):
             else:
                 # update loc
                 # x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+                self.lastx = self.x
+                self.lasty = self.y
                 self.x += tx
                 self.y += ty
                 self.rect.x += tx * TILESIZE
@@ -117,10 +120,13 @@ class WSPELL(pg.sprite.Sprite):
     def check_hit(self):
         for sprite in self.game.all_sprites:
             try:
-                if sprite.x == self.x and sprite.y == self.y and sprite != self:
-                    self.hit(sprite)
-                    self.active = False
-                    return
+                an = sprite.x == self.x and sprite.y == self.y
+                ab = sprite.x == self.lastx and sprite.y == self.lasty
+                if sprite != self:
+                    if an or ab:
+                        self.hit(sprite)
+                        self.active = False
+                        return
             except:
                 pass
 
@@ -162,8 +168,7 @@ class Fire(WSPELL):
         self.active = False
     
     # TODO not getting called?
-    def draw(self, screen):
-        print("dr")
+    def drawt(self, screen):
         if self.active:
             try:
                 print(f"|{self.rect.x},{self.rect.y}|{SPELL_SIZE}|{self.rect.x + SPELL_SIZE}")

@@ -39,10 +39,13 @@ class Player(pg.sprite.Sprite):
         self.equipped_spell = None
         self.is_firing = False
 
+    def drawt(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
     
-    def take_damage(self, amount):
+    def take_damage(self, source, amount):
         self.state.health -= amount
-        self.game.log.info(f"OUCH. Remaining health: {self.state.health}")
+        self.game.log.info(f"YYYYYYY Hit by {source.name} for {amount} damage")
+        self.game.log.info(f"YYYYYYY Remaining health: {self.state.health}")
         if self.state.health <= 0:
             self.state.alive = False
     
