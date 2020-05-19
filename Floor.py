@@ -69,8 +69,7 @@ class Floor:
         self.all.append(enemy)
     
     def remove_enemy(self, enemy):
-        print("removing enemy")
-        self.enemies[enemy].kill()
+        enemy.kill()
         del self.enemies[enemy]
         del self.all[enemy]
 
@@ -92,24 +91,13 @@ class Floor:
         xmax = self.current_view[0][1]
         ymin = self.current_view[1][0]
         ymax = self.current_view[1][1]
-        
-        # walls
-        for i, wall in enumerate(self.walls):
-            if wall.x < xmin or wall.x > xmax or wall.y < ymin or wall.y > ymax:
-                wall.kill()
-                del self.walls[i]
-        
-        # interactable objects
-        for i, inter in enumerate(self.inters):
-            if inter.gx < xmin or inter.gx > xmax or inter.gy < ymin or inter.gy > ymax:
-                inter.visible = False
-        
-        # enemies TODO improve this system
-        for i, enemy in enumerate(self.enemies):
-            if enemy.health < 0:
-                self.remove_enemy(i)
-            elif enemy.gx < xmin or enemy.gx > xmax or enemy.gy < ymin or enemy.gy > ymax:
-                enemy.visible = False
+
+        for sprite in self.all:
+            if sprite.x < xmin or sprite.x > xmax or sprite.y < ymin or sprite.y > ymax:
+                sprite.visible = False
+            if sprite.is_enemy:
+                if sprite.health < 0:
+                    self.remove_enemy(sprite)
     
     def update_seen(self):
         """
@@ -123,19 +111,6 @@ class Floor:
 
         for sprite in self.all:
             sprite.visible = True
-
-        # # walls
-        # for wall in self.walls:
-        #     wall.visible = True
-        
-        # # interactable objects
-        # for inter in self.inters:
-        #     inter.visible = True
-                
-        # # enemies TODO improve this system
-        # for enemy in self.enemies:
-        #     enemy.visible = True
-
 
     def update_viewport(self, gx, gy):
         # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
@@ -175,13 +150,14 @@ class Floor:
                     sk = Skeleton(self.game, lx, ly, gx, gy)
                     self.add_enemy(sk)
                 else:
-                    try:
-                        sprite_at = self.game.get_sprite_at(lx, ly)
-                        if sprite_at and sprite_at.name == "Wall":
-                            self.clear_space(lx, ly)
-                    except Exception as e:
-                        print(e)
-                        traceback.print_exc(e)
+                    pass
+                    # try:
+                    #     sprite_at = self.game.get_sprite_at(lx, ly)
+                    #     if sprite_at and sprite_at.name == "Wall":
+                    #         self.clear_space(lx, ly)
+                    # except Exception as e:
+                    #     print(e)
+                    #     traceback.print_exc(e)
 
 
     def populate_floor(self):

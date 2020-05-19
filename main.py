@@ -112,8 +112,11 @@ class Game:
             cur_g_x = self.player.gx
             cur_g_y = self.player.gy
 
-            self.all_sprites.update()
             self.playerg.update()
+            self.walls.update()
+            self.spells.update()
+            self.enemies.update()
+            self.inters.update()
             self.current_floor.update_viewport(cur_g_x, cur_g_y)
             self.player.still = True
             self.tick = False

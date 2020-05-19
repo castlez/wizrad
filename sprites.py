@@ -31,9 +31,11 @@ class WSPRITE(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE
         self.inspect_message = "I have no idea what that is..."
         self.interact_message = "Not sure what I could do with that..."
-        self.visible = True
 
-        self.blocking = True
+        # for other sprites to check
+        self.visible = True
+        self.blocking = False
+        self.is_enemy = False
     
     def update(self):
         if not self.game.object_in_view(self.gx, self.gy):
@@ -62,8 +64,22 @@ class Wall(WSPRITE):
     def inspect(self):
         return "I think its.. well, it might be.. yeah that is! Its a wall!"
     
+    def get_local_pos(self):
+        return self.game.current_floor.get_local_pos(self.gx, self.gy)
+    
     def update(self):
-        super().update()
+        if self.visible:
+            try:
+                x, y = self.get_local_pos() 
+                if x == -1 and y == -1:
+                    return
+                self.x = x - self.game.player.dx
+                self.y = y - self.game.player.dy
+            except Exception as e:
+                print(e)
+                traceback.print_exc(e)
+            self.rect.x = self.x * TILESIZE
+            self.rect.y = self.y * TILESIZE
     
     def take_damage(self, amount):
         self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
@@ -125,6 +141,7 @@ class Skeleton(WSPRITE):
         self.health = 6
         self.inspect_message = f"An animated skeleton. A good fireball should do the trick."
         self.blocking = True
+        self.is_enemy = True
 
         # exp
         self.skip = False  # skip a tick after hitting the player
@@ -147,6 +164,17 @@ class Skeleton(WSPRITE):
         cx = round(dx)
         cy = round(dy)
 
+        # check if already diagonal to player and just
+        # need to move to hit range (adjacent NON diagonal)
+        if self.adjacent_to_player(self.x, self.y):
+            if abs(cx) == 1 and abs(cy) == 1:
+                # we are diagonal
+                print("we are adjacent and diagonal")
+                t = cx + cy
+                if t == 0:
+                    return 0, cy
+                else:
+                    return cx, 0
         return cx, cy
     
     def check_player_los(self):
@@ -154,6 +182,8 @@ class Skeleton(WSPRITE):
         y = self.y
         
         while x in range(0, GRIDWIDTH) and y in range(0, GRIDHEIGHT):
+            if self.adjacent_to_player(x, y):
+                return True
             dx, dy = self.get_next_space()
             x += dx
             y += dy
@@ -161,8 +191,6 @@ class Skeleton(WSPRITE):
                 for sprite in self.game.all_sprites:
                     if sprite.x == x and sprite.y == y and sprite != self:
                         if sprite.name == "Player":
-                            return True
-                        elif self.adjacent_to_player(x, y):
                             return True
                         elif sprite.name == "Wall":
                             return False
@@ -174,8 +202,12 @@ class Skeleton(WSPRITE):
     def adjacent_to_player(self, newx, newy):
         px = self.game.player.x
         py = self.game.player.y
-
-        return newx == px and newy == py
+        dx = abs(px - newx)
+        dy = abs(py - newy)
+        adjacent = dx == 1 and dy == 1
+        if adjacent:
+            print("adjacent")
+        return adjacent
 
     def update(self):
         if self.visible:
@@ -186,6 +218,7 @@ class Skeleton(WSPRITE):
             cx, cy = self.get_next_space()
             newx = self.x + cx 
             newy = self.y + cy
+            print(f"x,y={self.x}, {self.y}, nx,ny={newx},{newy}")
             # check collisions
             blocked = False
             hit_sprite = None
@@ -202,14 +235,15 @@ class Skeleton(WSPRITE):
             # if we are unblocked and can see the player
             # then we check if we are already next to the player
             # and if not, we move
+            print(f"{see_player}, {blocked}, {cx},{cy}")
             if not blocked and see_player and not self.skip:
-                if not self.adjacent_to_player(newx, newy):
-                    self.gx += cx
-                    self.gy += cy
+                self.gx += cx
+                self.gy += cy
 
-                    x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
-                    self.x = x
-                    self.y = y
+                x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+                self.x = x
+                self.y = y
+                    
             else:
                 # just adjust for viewpoint movement
                 self.x -= self.game.player.dx
