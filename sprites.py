@@ -1,6 +1,7 @@
 import pygame as pg
 from spells import *
 from settings import *
+import traceback
 import math
 
 
@@ -85,10 +86,13 @@ class BurningPile(WSPRITE):
         if self.visible:
             try:
                 x, y = self.get_local_pos() 
+                if x == -1 and y == -1:
+                    return
                 self.x = x - self.game.player.dx
                 self.y = y - self.game.player.dy
             except Exception as e:
                 print(e)
+                traceback.print_exc(e)
             self.rect.x = self.x * TILESIZE
             self.rect.y = self.y * TILESIZE
     
@@ -163,7 +167,7 @@ class Skeleton(WSPRITE):
                         elif sprite.name == "Wall":
                             return False
             except Exception as e:
-                print(e)
+                traceback.print_exc(e)
                 continue
         return False
     

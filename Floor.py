@@ -6,6 +6,7 @@ from sprites import *
 import os
 import json
 import random
+import traceback
 
 from dg.dungeonGenerationAlgorithms import RoomAddition
 
@@ -27,6 +28,7 @@ class Floor:
         self.inters = []
         self.floor_number = floor_number
         self.walls = []
+        self.all = []
         # current view port, [[xmin, xmax], [ymin, ymax]]
         self.current_view = [[0, 0],[0, 0]]
         self.game = game
@@ -56,17 +58,21 @@ class Floor:
 
     def add_wall(self, wall):
         self.walls.append(wall)
+        self.all.append(wall)
     
     def add_inter(self, interactable):
         self.inters.append(interactable)
+        self.all.append(interactable)
     
     def add_enemy(self, enemy):
         self.enemies.append(enemy)
+        self.all.append(enemy)
     
     def remove_enemy(self, enemy):
         print("removing enemy")
         self.enemies[enemy].kill()
         del self.enemies[enemy]
+        del self.all[enemy]
 
     def get_local_pos(self, gx, gy):
         xmin = self.current_view[0][0]
@@ -75,7 +81,7 @@ class Floor:
         ymax = self.current_view[1][1]
 
         if gx < xmin or gx > xmax or gy < ymin or gy > ymax:
-            return None
+            return -1, -1
         
         lx = gx - xmin
         ly = gy - ymin
@@ -115,17 +121,20 @@ class Floor:
         ymin = self.current_view[1][0]
         ymax = self.current_view[1][1]
 
-        # walls
-        for wall in self.walls:
-            wall.visible = True
+        for sprite in self.all:
+            sprite.visible = True
+
+        # # walls
+        # for wall in self.walls:
+        #     wall.visible = True
         
-        # interactable objects
-        for inter in self.inters:
-            inter.visible = True
+        # # interactable objects
+        # for inter in self.inters:
+        #     inter.visible = True
                 
-        # enemies TODO improve this system
-        for enemy in self.enemies:
-            enemy.visible = True
+        # # enemies TODO improve this system
+        # for enemy in self.enemies:
+        #     enemy.visible = True
 
 
     def update_viewport(self, gx, gy):
@@ -172,6 +181,8 @@ class Floor:
                             self.clear_space(lx, ly)
                     except Exception as e:
                         print(e)
+                        traceback.print_exc(e)
+
 
     def populate_floor(self):
         """

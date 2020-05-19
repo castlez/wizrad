@@ -103,6 +103,7 @@ class WSPELL(pg.sprite.Sprite):
             self.gx += tx
             self.gy += ty
             if not self.game.object_in_view(self.gx, self.gy):
+                print("offscreen")
                 self.active = False
                 self.game.player.is_firing = False
             else:
@@ -173,11 +174,5 @@ class Fire(WSPELL):
             self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
             self.rect.y = SPELL_SIZE/4 + self.y * TILESIZE
             im = pg.transform.rotozoom(self.image, 45, 1)
-            # im = im.set_alpha(128)
             screen.blit(im, (self.rect.x, self.rect.y))
-    
-
-
-
-
             
