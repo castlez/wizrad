@@ -31,7 +31,7 @@ class Player(pg.sprite.Sprite):
         self.gy = 0
         self.still = True
 
-        self.collisions = False
+        self.collisions = True
 
         # game statue
         self.spells = []

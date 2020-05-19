@@ -127,14 +127,12 @@ class Game:
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
+            pg.draw.line(self.screen, DARKGREY, (x, 0), (x, HEIGHT))
         for y in range(0, HEIGHT, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
+            pg.draw.line(self.screen, DARKGREY, (0, y), (WIDTH, y))
 
     def draw(self):
         self.screen.fill(BGCOLOR)
-        if self.show_grid:
-            self.draw_grid()
         for wall in self.walls:
             wall.drawt(self.screen)
         for enemy in self.enemies:
@@ -143,6 +141,8 @@ class Game:
             inter.drawt(self.screen)
         for spell in self.spells:
             spell.drawt(self.screen)
+        if self.show_grid:
+            self.draw_grid()
         self.player.drawt(self.screen)
         self.log.draw(self.screen)
         pg.display.flip()

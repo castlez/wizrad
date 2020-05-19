@@ -104,7 +104,30 @@ class Floor:
                 self.remove_enemy(i)
             elif enemy.gx < xmin or enemy.gx > xmax or enemy.gy < ymin or enemy.gy > ymax:
                 enemy.visible = False
+    
+    def update_seen(self):
+        """
+        if something is still in the lists
+        set its visible to true
+        """
+        xmin = self.current_view[0][0]
+        xmax = self.current_view[0][1]
+        ymin = self.current_view[1][0]
+        ymax = self.current_view[1][1]
+
+        # walls
+        for wall in self.walls:
+            wall.visible = True
         
+        # interactable objects
+        for inter in self.inters:
+            inter.visible = True
+                
+        # enemies TODO improve this system
+        for enemy in self.enemies:
+            enemy.visible = True
+
+
     def update_viewport(self, gx, gy):
         # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
         xmin = gx - 6
@@ -116,6 +139,7 @@ class Floor:
         # no longer visible
         self.current_view = [[xmin, xmax], [ymin, ymax]]
         self.purge_unseen()
+        self.update_seen()
 
         # get ranges for viewport and the corresponding area
         # in the global map

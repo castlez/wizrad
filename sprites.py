@@ -30,6 +30,7 @@ class WSPRITE(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE
         self.inspect_message = "I have no idea what that is..."
         self.interact_message = "Not sure what I could do with that..."
+        self.visible = True
 
         self.blocking = True
     
@@ -47,7 +48,8 @@ class WSPRITE(pg.sprite.Sprite):
         super().kill()
     
     def drawt(self, screen):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+        if self.visible:
+            screen.blit(self.image, (self.rect.x, self.rect.y))
 
 class Wall(WSPRITE):
     def __init__(self, game, x, y, gx, gy):
@@ -119,7 +121,6 @@ class Skeleton(WSPRITE):
         self.health = 6
         self.inspect_message = f"An animated skeleton. A good fireball should do the trick."
         self.blocking = True
-        self.visible = True
 
         # exp
         self.skip = False  # skip a tick after hitting the player
