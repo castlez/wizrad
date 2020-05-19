@@ -26,7 +26,7 @@ MAP_HEIGHT = 60
 # Meta Data
 FPS = 60
 TITLE = "Wizrad"
-BGCOLOR = DARKGREY
+BGCOLOR = BLACK
 # the interval of time in which things happen
 TIME_INTERVAL = 0.5
 

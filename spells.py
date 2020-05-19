@@ -13,7 +13,7 @@ class WSPELL(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((SPELL_SIZE, SPELL_SIZE))
-        self.image = pg.transform.rotate(self.image, 0.45)
+        # self.image = pg.transform.rotate(self.image, 0.45)
         self.image.fill(color)
         self.rect = self.image.get_rect()
         self.blocking = False
@@ -112,8 +112,8 @@ class WSPELL(pg.sprite.Sprite):
                 self.lasty = self.y
                 self.x += tx
                 self.y += ty
-                self.rect.x += tx * TILESIZE
                 self.rect.y += ty * TILESIZE
+                self.rect.x += tx * TILESIZE
                 # check if you hit something
                 self.check_hit()
     
@@ -170,13 +170,11 @@ class Fire(WSPELL):
     # TODO not getting called?
     def drawt(self, screen):
         if self.active:
-            try:
-                print(f"|{self.rect.x},{self.rect.y}|{SPELL_SIZE}|{self.rect.x + SPELL_SIZE}")
-            except Exception as e:
-                print(e)
-            draw_x = self.rect.x
-            draw_y = self.rect.y + SPELL_SIZE/2
-            screen.blit(self.rect, (draw_x, draw_y))
+            self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
+            self.rect.y = SPELL_SIZE/4 + self.y * TILESIZE
+            im = pg.transform.rotozoom(self.image, 45, 1)
+            # im = im.set_alpha(128)
+            screen.blit(im, (self.rect.x, self.rect.y))
     
 
 
