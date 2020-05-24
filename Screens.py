@@ -65,7 +65,7 @@ class Inventory(WSCREEN):
                 self.obj = obj
                 # if its a stat, display its value
                 if obj in PlayerState.get_stats():
-                    self.text = f"{obj.name}: {obj.value}"
+                    self.text = obj.get_display()
                 else:
                     self.text = obj.name
             else:

@@ -203,6 +203,7 @@ class Skeleton(WSPRITE):
         self.inspect_message = f"An animated skeleton. A good fireball should do the trick."
         self.blocking = True
         self.is_enemy = True
+        self.alive = True
 
         # movement
         self.skip = False  # skip a tick after hitting the player
@@ -256,9 +257,11 @@ class Skeleton(WSPRITE):
     def take_damage(self, amount):
         self.health = self.health - amount
         self.game.log.info(f"I hit the skeleton for {amount} damage! ({self.health} hp)")
-        if self.health <= 0:
+        if self.health <= 0 and self.alive:
             self.game.log.info("...and it killed it!")
+            self.game.player.gain_xp(SK_XP)
             self.set_sign(SKELETON + DEAD)
+            self.alive = False
     
     def hit(self, target):
         # can only hurt the player

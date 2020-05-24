@@ -51,9 +51,16 @@ S_Y = 0
 
 ###### Player ######
 
+# starting stats
 PLAYER_START_STR = 3
 PLAYER_START_CON = 10
 PLAYER_START_INT = 3
+
+# stat increase rates (gain RATE% of a point per level)
+PLAYER_STR_RATE = 0.5
+PLAYER_CON_RATE = 1.5
+PLAYER_INT_RATE = 0.5
+
 
 GODMODE = True
 
@@ -100,3 +107,4 @@ SKMIN = 20
 SKMAX = 30
 SKLIFE = 5
 SKDAMAGE_RANGE = [2, 4]
+SK_XP = 8   

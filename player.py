@@ -1,7 +1,9 @@
 import pygame as pg
 from settings import *
+from utils import fib
 import os
 import traceback
+from functools import reduce
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
@@ -183,83 +185,113 @@ class Player(pg.sprite.Sprite):
     
     def get_stats(self):
         return self.state.get_stats()
+    
+    def gain_xp(self, amount):
+        self.state.Experience.value += amount
+        if self.state.Experience.value >= self.state.next_level_xp():
+            self.state.level_up()
+            self.game.log.info("I leveled up!")
 
 class PlayerState:
     known_spells = None
     alive = True
     inventory = []
+    
+    @classmethod
+    def next_level_xp(cls):
+        """
+        xp needed == sum(fib(next_level))*10
+        """
+        next_level = cls.Level.value + 1
+        if next_level == 1:
+            return 10
+        else:
+            needed = 0
+            for f in fib(next_level):
+                needed += f * 10
+            print(f"xp needed for lvl {next_level}: {needed}")
+            return needed
 
     # these absurd classes are because i need
     # to be able to display contextual information
     # in menues about these stats (what they do)
-    class Health:
+    class STAT:
+        name = ""
+        exact = 0.0
+        value = 0
+        max_value = 0
+        description = "a state"
+        changed = False
+        @classmethod
+        def inspect(cls):
+            return cls.description
+        @classmethod
+        def increase(cls, value):
+            cls.exact += value
+            cls.value += int(cls.exact)
+            cls.max_value += int(cls.exact)
+        @classmethod
+        def is_changed(cls):
+            changed = cls.changed
+            cls.changed = False
+            return changed
+        @classmethod
+        def get_display(cls):
+            return f"{cls.name}: {cls.value}/{cls.max_value}"
+    class Level(STAT):
+        name = "Level"
+        value = 0
+        max_value = 0
+        description = "My current level"
+        changed = False
+        @classmethod
+        def get_display(cls):
+            return f"{cls.name}: {cls.value}"
+    class Experience(STAT):
+        name = "Experience"
+        value = 0
+        max_value = 10
+        description = "My experience"
+        changed = False
+    class Health(STAT):
         name = "Health"
         value = PLAYER_START_CON
+        max_value = PLAYER_START_CON
         description = "My current health"
         changed = False
-        @classmethod
-        def inspect(cls):
-            return cls.description
-        @classmethod
-        def set(cls, value):
-            cls.value = value
-        @classmethod
-        def is_changed(cls):
-            changed = cls.changed
-            cls.changed = False
-            return changed
-    class Strength:
+    class Strength(STAT):
         name = "Strength"
         value = PLAYER_START_STR
+        max_value = PLAYER_START_STR
         description = "How many items I can carry"
         changed = False
-        @classmethod
-        def inspect(cls):
-            return cls.description
-        @classmethod
-        def set(cls, value):
-            cls.value = value
-        @classmethod
-        def is_changed(cls):
-            changed = cls.changed
-            cls.changed = False
-            return changed
-    class Constitution:
+    class Constitution(STAT):
         name = "Constitution"
         value = PLAYER_START_CON
+        max_value = PLAYER_START_CON
         description = "My max hitpoints (at full health)"
         changed = False
-        @classmethod
-        def inspect(cls):
-            return cls.description
-        @classmethod
-        def set(cls, value):
-            cls.value = value
-        @classmethod
-        def is_changed(cls):
-            changed = cls.changed
-            cls.changed = False
-            return changed
-    class Intelligence:
+    class Intelligence(STAT):
         name = "Intelligence"
         value = PLAYER_START_INT
+        max_value = PLAYER_START_INT
         description = "How many spells I can know"
         changed = False
-        @classmethod
-        def inspect(cls):
-            return cls.description
-        @classmethod
-        def set(cls, value):
-            cls.value = value
-        @classmethod
-        def is_changed(cls):
-            changed = cls.changed
-            cls.changed = False
-            return changed
     
     @classmethod
+    def level_up(cls):
+        # increase the stats current AND max values
+        # (in case there are negative/positive effects)
+        cls.Strength.increase(PLAYER_STR_RATE)
+        cls.Constitution.increase(PLAYER_CON_RATE)
+        cls.Health.increase(PLAYER_CON_RATE)
+        cls.Intelligence.increase(PLAYER_INT_RATE)
+        cls.Level.value += 1
+        cls.Experience.max_value = PlayerState.next_level_xp()
+
+    @classmethod
     def get_stats(cls):
-        return [cls.Health, cls.Strength, cls.Constitution, cls.Intelligence]
+        return [cls.Health, cls.Level, cls.Experience, cls.Strength, cls.Constitution, cls.Intelligence]
     
     @classmethod
     def stats_changed(cls):
