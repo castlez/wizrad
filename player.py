@@ -44,6 +44,9 @@ class Player(pg.sprite.Sprite):
         screen.blit(self.image, (self.rect.x, self.rect.y))
     
     def take_damage(self, source, amount):
+        if GODMODE:
+            self.game.log.info(f"Woulda taken {amount} dmg if not for godmode")
+            return
         self.state.Health.value -= amount
         self.game.log.info(f"Hit by {source.name} for {amount} damage")
         self.game.log.info(f"Remaining health: {self.state.Health.value}")
@@ -88,7 +91,7 @@ class Player(pg.sprite.Sprite):
             if new_x == sprite.x and new_y == sprite.y and sprite.blocking:
                 blocked = True
         # blocked if we hit something and collisions are on
-        is_blocked = blocked and self.collisions
+        is_blocked = blocked and not self.game.godmode
         return is_blocked
     
     def inspect_space(self, mouse_pos):
@@ -142,9 +145,14 @@ class Player(pg.sprite.Sprite):
             self.active_spells.append(spell)
     
     def get_item(self, item):
-        self.state.inventory.append(item)
-        if not self.equipped_item:
-            self.equipped_item = item
+        if len(self.state.inventory) + 1 <= self.state.Strength.value:
+            self.state.inventory.append(item)
+            if not self.equipped_item:
+                self.equipped_item = item
+            return True
+        else:
+            self.game.log.info("I can't carry any more :(")
+            return False
     
     def use_item(self):
         if self.equipped_item:

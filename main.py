@@ -34,6 +34,7 @@ class Game:
         self.log = None
         self.tick = False
         self.show_inventory = False
+        self.godmode = GODMODE
 
         pg.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
@@ -197,7 +198,7 @@ class Game:
                     if event.key == pg.K_g:
                         self.show_grid = not self.show_grid
                     if event.key == pg.K_l:
-                        self.player.collisions = not self.player.collisions
+                        self.godmode = not self.godmode
                     if event.key == pg.K_i:
                         self.show_inventory = True
                     if event.key == pg.K_o:

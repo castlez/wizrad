@@ -94,7 +94,6 @@ class WSPRITE(pg.sprite.Sprite):
         if self.adjacent_to_player(self.x, self.y):
             if abs(cx) == 1 and abs(cy) == 1:
                 # we are diagonal
-                print("we are adjacent and diagonal")
                 t = cx + cy
                 if t == 0:
                     return 0, cy
@@ -130,8 +129,6 @@ class WSPRITE(pg.sprite.Sprite):
         dx = abs(px - newx)
         dy = abs(py - newy)
         adjacent = dx <= 1 and dy <= 1
-        if adjacent:
-            print("adjacent")
         return adjacent
 
 # Walls
@@ -180,9 +177,12 @@ class Chest(WSPRITE):
     
     def interact(self, player):
         if self.adjacent_to_player(self.x, self.y):
-            self.game.player.get_item(self.contents)
-            self.game.current_floor.remove_inter(self)
-            return f"Got a {self.contents.name}!"
+            # if the players inven is not full, grab the item
+            # and remove the chest
+            got = self.game.player.get_item(self.contents)
+            if got:
+                self.game.current_floor.remove_inter(self)
+                return f"Got a {self.contents.name}!"
         else:
             return "The chest is to far away for me to open..."
 
