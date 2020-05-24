@@ -49,7 +49,7 @@ class Game:
         self.spells = pg.sprite.Group()
         self.playerg = pg.sprite.Group()
         self.screens = pg.sprite.Group()
-        self.player = Player(self, 8, 8)
+        self.player = Player(self, PLAYER_X, PLAYER_Y)
         self.log = LogWindow(self, 3, 15)
         self.inventory = Inventory(self, 0, 0)
 
@@ -208,6 +208,8 @@ class Game:
                         self.log.update_place(change=1)
                     if event.key == pg.K_UP:
                         self.log.update_place(change=-1)
+                    if event.key == pg.K_h:
+                        self.help()
                 elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                     mouse_pos = pg.mouse.get_pos()
                     self.player.inspect_space(mouse_pos)
@@ -224,6 +226,12 @@ class Game:
             except:
                 pass
         return None
+    
+    def help(self):
+        """
+        prints the help message
+        """
+        self.log.info("[H, help]  [L-Click inspect]  [R-Click, interact ]  [Space, fire spell ]  [I, inventory]")
     
     def object_in_view(self, gx, gy):
         """

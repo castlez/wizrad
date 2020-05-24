@@ -25,6 +25,7 @@ class Player(pg.sprite.Sprite):
         # position on the screen with current change
         self.x = x
         self.y = y
+        print(f"player xy: {x},{y}")
         self.dx = 0
         self.dy = 0
         
@@ -150,6 +151,8 @@ class Player(pg.sprite.Sprite):
             self.is_firing = True
             spell = self.equipped_spell(self.game, mouse_pos)
             self.active_spells.append(spell)
+        else:
+            self.game.log.info("I don't know any spells. Maybe I could study my surroundings...")
     
     def get_item(self, item):
         if len(self.state.inventory) + 1 <= self.state.Strength.value:

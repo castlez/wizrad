@@ -1,7 +1,7 @@
 # strings
 INTRO = ["i:Welcome to Wizrad! Find all the elements and break "\
          "the Omni Gem for ultimate POWER",
-         "i:(wasd to move, left click to inspect)"]
+         "i:(wasd to move, left click to inspect, h for help with other controls)"]
 
 # define some colors (R, G, B)
 WHITE = (255, 255, 255)
@@ -14,11 +14,13 @@ YELLOW = (255, 255, 0)
 BROWN = (168, 104, 50)
 
 # Sizes
-WIDTH = 512   # TILESIZE * 32
-HEIGHT = 512  # TILESIZE * 32
+TILESIZE = 32
+GRIDWIDTH = 24
+GRIDHEIGHT = 24
+WIDTH = TILESIZE * GRIDWIDTH
+HEIGHT = TILESIZE * GRIDHEIGHT
 TEXTBOX_HEIGHT = 10
-PLAYER_X = 8
-PLAYER_Y = 8
+
 
 # full mape size (for generation)
 MAP_WIDTH = 80
@@ -31,20 +33,19 @@ BGCOLOR = BLACK
 # the interval of time in which things happen
 TIME_INTERVAL = 0.5
 
-# Viewport (camera) sizes (32 wide, 24 high)
-TILESIZE = 32
-GRIDWIDTH = int(WIDTH / TILESIZE)
-GRIDHEIGHT = int(HEIGHT / TILESIZE)
+# Viewport
+PLAYER_X = int(GRIDWIDTH/2)
+PLAYER_Y = int(GRIDHEIGHT/2) - 1  # -1 to account for log window
 
 # Log
 VIS_LOG_LINES = 3
-TEXT_SIZE = 12
+TEXT_SIZE = 18
 LOG_LINE_DIST = TEXT_SIZE + 5
 LOG_X = 0
 LOG_Y = int(float(HEIGHT)*0.90)
 
 # Screens (inven, spellmaking, etc)
-S_TEXT_SIZE = 15
+S_TEXT_SIZE = TEXT_SIZE + 3
 S_LINE_DIST = S_TEXT_SIZE + 5
 S_X = 0
 S_Y = 0

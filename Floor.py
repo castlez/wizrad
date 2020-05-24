@@ -128,10 +128,10 @@ class Floor:
 
     def update_viewport(self, gx, gy):
         # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
-        xmin = gx - 6
-        xmax = gx + 10
-        ymin = gy - 6
-        ymax = gy + 10 
+        xmin = gx - PLAYER_X - 2
+        xmax = gx + PLAYER_X + 2
+        ymin = gy - PLAYER_Y - 2
+        ymax = gy + PLAYER_Y + 2
 
         # update the current view and purge anything
         # no longer visible
