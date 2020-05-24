@@ -10,7 +10,11 @@ dungeon generation using this amazing tool https://github.com/AtTheMatinee/dunge
 ### 0.0.1
 #### First Uber alpha build
 Feature List:
+
 Drawing, updating of the screen
+
 movement, collisions, interations
+
 enemies (skeleton), spells (fireball), items (healing potion)
+
 RPG elements (experience, stats, etc)
