@@ -272,5 +272,5 @@ class Skeleton(WSPRITE):
             
     
     def interact(self, player):
-        return "I only know to kill things with magic..."
+        return "I only know to kill things with magic... (Press space to fire at cursor)"
     

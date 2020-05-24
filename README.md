@@ -7,6 +7,12 @@ dungeon generation using this amazing tool https://github.com/AtTheMatinee/dunge
 
 ## Releases
 
+### 0.0.2
+#### Usability and extra spells, spellmaking
+Feature List:
+
+Added installer/runner Wizrad.bat
+
 ### 0.0.1
 #### First Uber alpha build
 Feature List:
