@@ -44,7 +44,7 @@ class Player(pg.sprite.Sprite):
         screen.blit(self.image, (self.rect.x, self.rect.y))
     
     def take_damage(self, source, amount):
-        if GODMODE:
+        if self.game.godmode:
             self.game.log.info(f"Woulda taken {amount} dmg if not for godmode")
             return
         self.state.Health.value -= amount
@@ -134,9 +134,14 @@ class Player(pg.sprite.Sprite):
         return [s.name for s in self.spells]
     
     def add_spell(self, spell):
-        self.spells.append(spell)
-        if not self.equipped_spell:
-            self.equipped_spell = spell
+        if len(self.spells) + 1 <= self.state.Intelligence.value:
+            self.spells.append(spell)
+            if not self.equipped_spell:
+                self.equipped_spell = spell
+            return True
+        else:
+            self.game.log.info("My mind is full, I cannot learn more spells till I level up :(")
+            return False
     
     def fire_spell(self, mouse_pos):
         if self.equipped_spell:
@@ -151,7 +156,6 @@ class Player(pg.sprite.Sprite):
                 self.equipped_item = item
             return True
         else:
-            self.game.log.info("I can't carry any more :(")
             return False
     
     def use_item(self):
@@ -167,7 +171,7 @@ class Player(pg.sprite.Sprite):
                     self.equipped_item = None
 
     def heal_hp(self, amount_pcnt):
-        max_health = self.state.Health.max_health
+        max_health = self.state.Constitution.value
         cur_health = self.state.Health.value
         gained = int(max_health * amount_pcnt)
         if cur_health + gained <= max_health:
@@ -190,8 +194,7 @@ class PlayerState:
     # in menues about these stats (what they do)
     class Health:
         name = "Health"
-        max_health = PLAYER_START_HEALTH
-        value = PLAYER_START_HEALTH
+        value = PLAYER_START_CON
         description = "My current health"
         changed = False
         @classmethod

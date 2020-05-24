@@ -183,6 +183,9 @@ class Chest(WSPRITE):
             if got:
                 self.game.current_floor.remove_inter(self)
                 return f"Got a {self.contents.name}!"
+            else:
+                return "I can't carry any more :("
+
         else:
             return "The chest is to far away for me to open..."
 

@@ -199,6 +199,7 @@ class Game:
                         self.show_grid = not self.show_grid
                     if event.key == pg.K_l:
                         self.godmode = not self.godmode
+                        self.log.info(f"GODMODE ON: {self.godmode}")
                     if event.key == pg.K_i:
                         self.show_inventory = True
                     if event.key == pg.K_o:
