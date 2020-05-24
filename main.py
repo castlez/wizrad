@@ -13,6 +13,7 @@ from sprites import *
 from Floor import *
 from LogWindow import *
 from player import *
+from Screens import *
 from dg.dungeonGenerationAlgorithms import RoomAddition
 
 
@@ -32,6 +33,7 @@ class Game:
         self.show_grid = True
         self.log = None
         self.tick = False
+        self.show_inventory = False
 
         pg.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
@@ -45,8 +47,10 @@ class Game:
         self.inters = pg.sprite.Group()
         self.spells = pg.sprite.Group()
         self.playerg = pg.sprite.Group()
+        self.screens = pg.sprite.Group()
         self.player = Player(self, 8, 8)
         self.log = LogWindow(self, 3, 15)
+        self.inventory = Inventory(self, 0, 0)
 
         # first floor (TODO start screen)
         self.current_floor = Floor(self, 1)
@@ -106,8 +110,10 @@ class Game:
         # (currently just player movement)
         if not self.player.still:
             self.tick = True
-        
-        if self.tick:  # NOTE: might be able to toggle turn based here... 
+
+        if self.show_inventory:
+            self.inventory.update()
+        elif self.tick:  # NOTE: might be able to toggle turn based here... 
             # use the global position of the player to decide what to draw
             cur_g_x = self.player.gx
             cur_g_y = self.player.gy
@@ -135,18 +141,21 @@ class Game:
             pg.draw.line(self.screen, DARKGREY, (0, y), (WIDTH, y))
 
     def draw(self):
-        self.screen.fill(BGCOLOR)
-        for wall in self.walls:
-            wall.drawt(self.screen)
-        for enemy in self.enemies:
-            enemy.drawt(self.screen)
-        for inter in self.inters:
-            inter.drawt(self.screen)
-        for spell in self.spells:
-            spell.drawt(self.screen)
-        if self.show_grid:
-            self.draw_grid()
-        self.player.drawt(self.screen)
+        if self.show_inventory:
+            self.inventory.drawt(self.screen)
+        else:
+            self.screen.fill(BGCOLOR)
+            for wall in self.walls:
+                wall.drawt(self.screen)
+            for enemy in self.enemies:
+                enemy.drawt(self.screen)
+            for inter in self.inters:
+                inter.drawt(self.screen)
+            for spell in self.spells:
+                spell.drawt(self.screen)
+            if self.show_grid:
+                self.draw_grid()
+            self.player.drawt(self.screen)
         self.log.draw(self.screen)
         pg.display.flip()
 
@@ -160,35 +169,36 @@ class Game:
                     self.quit()
                 if event.key == pg.K_m:
                     self.quit(save_map=True)
-                if event.key == pg.K_a:
-                    self.player.move(dx=-1)
-                if event.key == pg.K_d:
-                    self.player.move(dx=1)
-                if event.key == pg.K_w:
-                    self.player.move(dy=-1)
-                if event.key == pg.K_s:
-                    self.player.move(dy=1)
+                if not self.show_inventory:
+                    if event.key == pg.K_a:
+                        self.player.move(dx=-1)
+                    if event.key == pg.K_d:
+                        self.player.move(dx=1)
+                    if event.key == pg.K_w:
+                        self.player.move(dy=-1)
+                    if event.key == pg.K_s:
+                        self.player.move(dy=1)
+                    if event.key == pg.K_SPACE:
+                        # if not self.player.is_firing: TODO maybe limit this?
+                        self.tick = True
+                        mouse_pos = pg.mouse.get_pos()
+                        self.player.fire_spell(mouse_pos)
+                    if event.key == pg.K_RETURN:
+                        self.tick = True
+                    if event.key == pg.K_RSHIFT or event.key == pg.K_LSHIFT:
+                        self.player.use_item()
                 if event.key == pg.K_g:
                     self.show_grid = not self.show_grid
                 if event.key == pg.K_l:
                     self.player.collisions = not self.player.collisions
+                if event.key == pg.K_i:
+                    self.show_inventory = not self.show_inventory
                 if event.key == pg.K_o:
                     print(f"group num walls = {len(self.walls)}")
                 if event.key == pg.K_DOWN:
                     self.log.update_place(change=1)
                 if event.key == pg.K_UP:
                     self.log.update_place(change=-1)
-                if event.key == pg.K_p:
-                    self.log.info(f"current spells: {self.player.get_spells()}")
-                if event.key == pg.K_e:
-                    self.log.info(f"current equipped spell: {self.player.equipped_spell}")
-                if event.key == pg.K_SPACE:
-                    # if not self.player.is_firing: TODO maybe limit this?
-                    self.tick = True
-                    mouse_pos = pg.mouse.get_pos()
-                    self.player.fire_spell(mouse_pos)
-                if event.key == pg.K_RETURN:
-                    self.tick = True
             elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
                 self.player.inspect_space(mouse_pos)

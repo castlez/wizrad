@@ -11,6 +11,7 @@ LIGHTGREY = (100, 100, 100)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
+BROWN = (168, 104, 50)
 
 # Sizes
 WIDTH = 512   # TILESIZE * 32
@@ -42,6 +43,12 @@ LOG_LINE_DIST = TEXT_SIZE + 5
 LOG_X = 0
 LOG_Y = int(float(HEIGHT)*0.90)
 
+# Screens (inven, spellmaking, etc)
+S_TEXT_SIZE = 15
+S_LINE_DIST = S_TEXT_SIZE + 5
+S_X = 0
+S_Y = 0
+
 ###### Player ######
 
 PLAYER_START_HEALTH = 10
@@ -49,6 +56,16 @@ PLAYER_START_HEALTH = 10
 # Movement
 SPRINT_DELAY = 1
 SPRINT_SPEED = 100
+
+###### Interactables ######
+
+CHEST = "ch"
+CHMIN = 20
+CHMAX = 30
+
+###### Items ######
+
+HP_POT = 0.4  # heal the player 40%
 
 ###### Elements/Spells ######
 
@@ -76,7 +93,6 @@ DEAD = "x"
 
 # Skeletons
 SKELETON = "sk"
-SPAWNED
 SKMIN = 20
 SKMAX = 30
 SKLIFE = 5

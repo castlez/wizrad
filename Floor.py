@@ -3,6 +3,7 @@ Floor stuff
 """
 from settings import *
 from sprites import *
+from Items import *
 import os
 import json
 import random
@@ -33,9 +34,29 @@ class Floor:
         self.current_view = [[0, 0],[0, 0]]
         self.game = game
 
+        # layout
         generator = RoomAddition()
         self.layout = generator.generateLevel(MAP_WIDTH, MAP_HEIGHT)
+
+        # loot
+        self.loot_table = None
+        self.set_loot_table()
         print("Level Loaded!")
+    
+    def set_loot_table(self):
+        """
+        Sets the loot table based on floor
+        """
+        if self.floor_number == 1:
+            self.loot_table = [HealingPotion]
+
+    def get_loot(self):
+        """
+        Gets a random item from the loot table
+        """
+        item_index = random.randint(0, len(self.loot_table)-1)
+        item = self.loot_table[item_index](self.game)
+        return item
     
     def get_valid_pos(self):
         while True:
@@ -43,18 +64,6 @@ class Floor:
             y = random.randint(1, MAP_HEIGHT-1)
             if self.layout[x][y] == 0:
                 return x, y
-    
-    def clear_space(self, x, y):
-        # TODO: i dont want to have to do this
-        # for every type of thing in a floor
-        # ACTUALLY i shouldnt be drawing new stuff
-        # this often, i shouldnt need this function...
-        for wall in self.walls:
-            if wall.x == x and wall.y == y:
-                wall.kill()
-        for inter in self.inters:
-            if inter.x == x and inter.y == y:
-                inter.kill()
 
     def add_wall(self, wall):
         self.walls.append(wall)
@@ -64,14 +73,19 @@ class Floor:
         self.inters.append(interactable)
         self.all.append(interactable)
     
+    def remove_inter(self, interactable):
+        interactable.kill()
+        self.inters.remove(interactable)
+        self.all.remove(interactable)
+    
     def add_enemy(self, enemy):
         self.enemies.append(enemy)
         self.all.append(enemy)
     
     def remove_enemy(self, enemy):
         enemy.kill()
-        del self.enemies[enemy]
-        del self.all[enemy]
+        self.enemies.remove(enemy)
+        self.all.remove(enemy)
 
     def get_local_pos(self, gx, gy):
         xmin = self.current_view[0][0]
@@ -149,16 +163,10 @@ class Floor:
                 elif value == SKELETON:
                     sk = Skeleton(self.game, lx, ly, gx, gy)
                     self.add_enemy(sk)
+                elif value == CHEST:
+                    self.add_inter(Chest(self.game, lx, ly, gx, gy))
                 else:
                     pass
-                    # try:
-                    #     sprite_at = self.game.get_sprite_at(lx, ly)
-                    #     if sprite_at and sprite_at.name == "Wall":
-                    #         self.clear_space(lx, ly)
-                    # except Exception as e:
-                    #     print(e)
-                    #     traceback.print_exc(e)
-
 
     def populate_floor(self):
         """
@@ -176,4 +184,10 @@ class Floor:
         for _ in range(num_skele):
             x, y = self.get_valid_pos()
             self.layout[x][y] = SKELETON
+        
+        # chests
+        num_chest = random.randint(CHMIN, CHMAX)
+        for _ in range(num_chest):
+            x, y = self.get_valid_pos()
+            self.layout[x][y] = CHEST
 

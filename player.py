@@ -33,11 +33,12 @@ class Player(pg.sprite.Sprite):
 
         self.collisions = True
 
-        # game statue
+        # game status
         self.spells = []
         self.active_spells = []
         self.equipped_spell = None
         self.is_firing = False
+        self.equipped_item = None
 
     def drawt(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))
@@ -92,14 +93,10 @@ class Player(pg.sprite.Sprite):
     
     def inspect_space(self, mouse_pos):
         message = ""
-        x = -1
-        y = -1
         for sprite in self.game.all_sprites:
             try:
                 if sprite.rect.collidepoint(mouse_pos):
                     message = sprite.inspect()
-                    x = sprite.gx
-                    y = sprite.gy
                     break
             except Exception as e:
                 self.game.log.info(e)
@@ -119,9 +116,8 @@ class Player(pg.sprite.Sprite):
             except Exception as e:
                 self.game.log.info(e)
                 continue
-        if message == "" and message == None:
-            message = "Its the floor. Im looking at the floor... "\
-                      "Maybe i should look at other things"
+        if message == "" or message == None:
+            message = "Not much to do with the floor really.."
         self.game.log.info(message)
     
     def has_element(self, element):
@@ -136,16 +132,35 @@ class Player(pg.sprite.Sprite):
     
     def add_spell(self, spell):
         self.spells.append(spell)
-        if self.equipped_spell == None:
-                self.equipped_spell = spell
+        if not self.equipped_spell:
+            self.equipped_spell = spell
     
     def fire_spell(self, mouse_pos):
         if self.equipped_spell:
             self.is_firing = True
             spell = self.equipped_spell(self.game, mouse_pos)
             self.active_spells.append(spell)
+    
+    def get_item(self, item):
+        self.state.inventory.append(item)
+        if not self.equipped_item:
+            self.equipped_item = item
+    
+    def use_item(self):
+        if self.equipped_item:
+            self.equipped_item.use()
+            # if its consumable, remove it after use
+            if self.equipped_item.consumable:
+                self.state.inventory.remove(self.equipped_item)
+                # equip the next item if there is one, or empty hands
+                if len(self.state.inventory) > 0:
+                    self.equipped_item = self.state.inventory[0]
+                else:
+                    self.equipped_item = None
 
 class PlayerState:
+    max_health = PLAYER_START_HEALTH
     health = PLAYER_START_HEALTH
     known_spells = None
     alive = True
+    inventory = []

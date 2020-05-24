@@ -4,7 +4,7 @@ from settings import *
 import traceback
 import math
 
-
+# Super class
 class WSPRITE(pg.sprite.Sprite):
     """
     Parent class for all sprites but the player
@@ -27,6 +27,7 @@ class WSPRITE(pg.sprite.Sprite):
         self.dy = 0
         self.gx = gx
         self.gy = gy
+        self.start_pos = (gx, gy)
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
         self.inspect_message = "I have no idea what that is..."
@@ -36,10 +37,6 @@ class WSPRITE(pg.sprite.Sprite):
         self.visible = True
         self.blocking = False
         self.is_enemy = False
-    
-    def update(self):
-        if not self.game.object_in_view(self.gx, self.gy):
-            super().kill()
     
     def inspect(self):
         return self.inspect_message
@@ -53,19 +50,6 @@ class WSPRITE(pg.sprite.Sprite):
     def drawt(self, screen):
         if self.visible:
             screen.blit(self.image, (self.rect.x, self.rect.y))
-
-class Wall(WSPRITE):
-    def __init__(self, game, x, y, gx, gy):
-        super().__init__(game, x, y, gx, gy, game.walls, color=LIGHTGREY)
-        self.inspect_message = "I think its.. well, it might be.. yeah that is! Its a wall!"
-        self.blocking = True
-        self.name = "Wall"
-    
-    def inspect(self):
-        return "I think its.. well, it might be.. yeah that is! Its a wall!"
-    
-    def get_local_pos(self):
-        return self.game.current_floor.get_local_pos(self.gx, self.gy)
     
     def update(self):
         if self.visible:
@@ -80,71 +64,12 @@ class Wall(WSPRITE):
                 traceback.print_exc(e)
             self.rect.x = self.x * TILESIZE
             self.rect.y = self.y * TILESIZE
-    
-    def take_damage(self, amount):
-        self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
 
-class BurningPile(WSPRITE):
-    """
-    These give you fire
-    """
-    def __init__(self, game, x, y, gx, gy):
-        super().__init__(game, x, y, gx, gy, game.inters, color=RED)
-        self.inspect_message = "A magic fire, i better watch out. Hmm.. "\
-                               "its interesting (right click to study)"
-        self.name = "BurningPile"
-        self.visible = True
-        self.start_pos = (gx, gy)
-        self.set_sign(FIRE + SPAWNED)
-        
-    
-    def update(self):
-        if self.visible:
-            try:
-                x, y = self.get_local_pos() 
-                if x == -1 and y == -1:
-                    return
-                self.x = x - self.game.player.dx
-                self.y = y - self.game.player.dy
-            except Exception as e:
-                print(e)
-                traceback.print_exc(e)
-            self.rect.x = self.x * TILESIZE
-            self.rect.y = self.y * TILESIZE
-    
     def get_local_pos(self):
         return self.game.current_floor.get_local_pos(self.gx, self.gy)
     
-    def draw(self, screen):
-        print("bp draw")
-        if self.visible:
-            screen.blit(self.rect, (self.rect.x, self.rect.y))
-    
-    def interact(self, player):
-        if player.has_element("fire"):
-            return "I already know how to wield fire magic"
-        else:
-            player.add_spell(Fire)
-            return "I studied the pile and learned the secrets of fire magic!"
-
     def set_sign(self, sign):
         self.game.current_floor.layout[self.start_pos[0]][self.start_pos[1]] = sign
-
-class Skeleton(WSPRITE):
-    def __init__(self, game, x, y, gx, gy):
-        super().__init__(game, x, y, gx, gy, game.enemies, color=WHITE)
-        self.start_pos = (gx, gy)
-        self.name = "Skeleton"
-        self.sign = SKELETON + SPAWNED
-        self.unspawned_sign = SKELETON
-        self.set_sign(self.sign)
-        self.health = 6
-        self.inspect_message = f"An animated skeleton. A good fireball should do the trick."
-        self.blocking = True
-        self.is_enemy = True
-
-        # exp
-        self.skip = False  # skip a tick after hitting the player
     
     def get_next_space(self):
         """
@@ -204,10 +129,80 @@ class Skeleton(WSPRITE):
         py = self.game.player.y
         dx = abs(px - newx)
         dy = abs(py - newy)
-        adjacent = dx == 1 and dy == 1
+        adjacent = dx <= 1 and dy <= 1
         if adjacent:
             print("adjacent")
         return adjacent
+
+# Walls
+class Wall(WSPRITE):
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.walls, color=LIGHTGREY)
+        self.inspect_message = "I think its.. well, it might be.. yeah that is! Its a wall!"
+        self.blocking = True
+        self.name = "Wall"
+    
+    def inspect(self):
+        return "I think its.. well, it might be.. yeah that is! Its a wall!"
+    
+    def take_damage(self, amount):
+        self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
+
+# Interactables
+class BurningPile(WSPRITE):
+    """
+    These give you fire
+    """
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.inters, color=RED)
+        self.inspect_message = "A magic fire, i better watch out. Hmm.. "\
+                               "its interesting (right click to study)"
+        self.name = "BurningPile"
+        self.set_sign(FIRE + SPAWNED)
+    
+    def interact(self, player):
+        if player.has_element("fire"):
+            return "I already know how to wield fire magic"
+        else:
+            player.add_spell(Fire)
+            return "I studied the pile and learned the secrets of fire magic!"
+
+class Chest(WSPRITE):
+    """
+    These have items in them!
+    """
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.inters, color=BROWN)
+        self.inspect_message = "Its a chest. Might have some loot in it..."
+        self.name = "Chest"
+        self.set_sign(CHEST + SPAWNED)
+        self.contents = self.game.current_floor.get_loot()
+    
+    def interact(self, player):
+        if self.adjacent_to_player(self.x, self.y):
+            self.game.player.get_item(self.contents)
+            self.game.current_floor.remove_inter(self)
+            return f"Got a {self.contents.name}! Current inventory: {self.game.player.state.inventory}"
+        else:
+            return "The chest is to far away for me to open..."
+
+
+# Enemies
+class Skeleton(WSPRITE):
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.enemies, color=WHITE)
+        self.start_pos = (gx, gy)
+        self.name = "Skeleton"
+        self.sign = SKELETON + SPAWNED
+        self.unspawned_sign = SKELETON
+        self.set_sign(self.sign)
+        self.health = 6
+        self.inspect_message = f"An animated skeleton. A good fireball should do the trick."
+        self.blocking = True
+        self.is_enemy = True
+
+        # movement
+        self.skip = False  # skip a tick after hitting the player
 
     def update(self):
         if self.visible:
@@ -218,7 +213,6 @@ class Skeleton(WSPRITE):
             cx, cy = self.get_next_space()
             newx = self.x + cx 
             newy = self.y + cy
-            print(f"x,y={self.x}, {self.y}, nx,ny={newx},{newy}")
             # check collisions
             blocked = False
             hit_sprite = None
@@ -235,7 +229,6 @@ class Skeleton(WSPRITE):
             # if we are unblocked and can see the player
             # then we check if we are already next to the player
             # and if not, we move
-            print(f"{see_player}, {blocked}, {cx},{cy}")
             if not blocked and see_player and not self.skip:
                 self.gx += cx
                 self.gy += cy
@@ -256,15 +249,12 @@ class Skeleton(WSPRITE):
         print("drawing skele")
         if self.visible:
             screen.blit(self.rect, (self.rect.x, self.rect.y))
-
-    def set_sign(self, sign):
-        self.game.current_floor.layout[self.start_pos[0]][self.start_pos[1]] = sign
     
     def take_damage(self, amount):
         self.health = self.health - amount
-        self.game.log.info(f"XXXXXXX I hit the skeleton for {amount} damage! ({self.health} hp)")
+        self.game.log.info(f"I hit the skeleton for {amount} damage! ({self.health} hp)")
         if self.health <= 0:
-            self.game.log.info("XXXXXXX ...and it killed it!")
+            self.game.log.info("...and it killed it!")
             self.set_sign(SKELETON + DEAD)
     
     def hit(self, target):

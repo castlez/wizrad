@@ -159,9 +159,9 @@ class WSPELL(pg.sprite.Sprite):
 
 class Fire(WSPELL):
     name = "Fire Ball"
+    elements = ["fire"]
     def __init__(self, game, target_pos):
         super().__init__(game, target_pos, color=RED)
-        self.elements.append("fire")
         self.inspect_message = "a Fire Ball spell"
     
     def hit(self, target):
