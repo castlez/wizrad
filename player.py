@@ -44,10 +44,10 @@ class Player(pg.sprite.Sprite):
         screen.blit(self.image, (self.rect.x, self.rect.y))
     
     def take_damage(self, source, amount):
-        self.state.health -= amount
-        self.game.log.info(f"YYYYYYY Hit by {source.name} for {amount} damage")
-        self.game.log.info(f"YYYYYYY Remaining health: {self.state.health}")
-        if self.state.health <= 0:
+        self.state.Health.value -= amount
+        self.game.log.info(f"Hit by {source.name} for {amount} damage")
+        self.game.log.info(f"Remaining health: {self.state.Health.value}")
+        if self.state.Health.value <= 0:
             self.state.alive = False
     
     def inspect(self):
@@ -158,9 +158,101 @@ class Player(pg.sprite.Sprite):
                 else:
                     self.equipped_item = None
 
+    def heal_hp(self, amount_pcnt):
+        max_health = self.state.Health.max_health
+        cur_health = self.state.Health.value
+        gained = int(max_health * amount_pcnt)
+        if cur_health + gained <= max_health:
+            new_health = cur_health + gained
+        else:
+            new_health = max_health
+        new_health = int(new_health)
+        self.state.Health.value = new_health
+    
+    def get_stats(self):
+        return self.state.get_stats()
+
 class PlayerState:
-    max_health = PLAYER_START_HEALTH
-    health = PLAYER_START_HEALTH
     known_spells = None
     alive = True
     inventory = []
+
+    # these absurd classes are because i need
+    # to be able to display contextual information
+    # in menues about these stats (what they do)
+    class Health:
+        name = "Health"
+        max_health = PLAYER_START_HEALTH
+        value = PLAYER_START_HEALTH
+        description = "My current health"
+        changed = False
+        @classmethod
+        def inspect(cls):
+            return cls.description
+        @classmethod
+        def set(cls, value):
+            cls.value = value
+        @classmethod
+        def is_changed(cls):
+            changed = cls.changed
+            cls.changed = False
+            return changed
+    class Strength:
+        name = "Strength"
+        value = PLAYER_START_STR
+        description = "How many items I can carry"
+        changed = False
+        @classmethod
+        def inspect(cls):
+            return cls.description
+        @classmethod
+        def set(cls, value):
+            cls.value = value
+        @classmethod
+        def is_changed(cls):
+            changed = cls.changed
+            cls.changed = False
+            return changed
+    class Constitution:
+        name = "Constitution"
+        value = PLAYER_START_CON
+        description = "My max hitpoints (at full health)"
+        changed = False
+        @classmethod
+        def inspect(cls):
+            return cls.description
+        @classmethod
+        def set(cls, value):
+            cls.value = value
+        @classmethod
+        def is_changed(cls):
+            changed = cls.changed
+            cls.changed = False
+            return changed
+    class Intelligence:
+        name = "Intelligence"
+        value = PLAYER_START_INT
+        description = "How many spells I can know"
+        changed = False
+        @classmethod
+        def inspect(cls):
+            return cls.description
+        @classmethod
+        def set(cls, value):
+            cls.value = value
+        @classmethod
+        def is_changed(cls):
+            changed = cls.changed
+            cls.changed = False
+            return changed
+    
+    @classmethod
+    def get_stats(cls):
+        return [cls.Health, cls.Strength, cls.Constitution, cls.Intelligence]
+    
+    @classmethod
+    def stats_changed(cls):
+        return cls.Strength.is_changed() or cls.Constitution.is_changed() or cls.Intelligence.is_changed()
+
+
+    

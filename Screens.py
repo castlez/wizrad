@@ -1,5 +1,6 @@
 import pygame as pg
 from settings import *
+from player import PlayerState
 import os
 
 class WSCREEN(pg.sprite.Sprite):
@@ -26,14 +27,14 @@ class WSCREEN(pg.sprite.Sprite):
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
 
-        # keep track of the visible lines
+        # keep track of the visible lines (these will get overridden by children)
         self.current_place = 0
-        # [[inventory], [spells]]
-        self.current_display = [[],[]]
+        self.current_display = []
 
         # text stuff
         fonts = pg.font.get_fonts()
         self.font = pg.font.SysFont(fonts[0], S_TEXT_SIZE)
+        self.header_buff = S_TEXT_SIZE * 2  # headers are two lines long
     
     def update(self):
         pass
@@ -42,9 +43,73 @@ class WSCREEN(pg.sprite.Sprite):
         pass
 
 class Inventory(WSCREEN):
+    """
+    Class handling the inventory screen
+    """
+
     def __init__(self, game, x, y):
         super().__init__(game, x, y)
+        # keep track of the visible lines
+        self.current_place = 0
+        # [[inventory], [spells], [states]]
+        self.current_display = [[],[],[]]
+        self.cur_x = x
+        self.cur_y = y + self.header_buff
+        self.starting = True
+
+    class Entry(pg.sprite.Sprite):
+        def __init__(self, game, obj, font, x, y):
+            self.groups = game.screens
+            pg.sprite.Sprite.__init__(self, self.groups)
+            if type(obj) != str:
+                self.obj = obj
+                # if its a stat, display its value
+                if obj in PlayerState.get_stats():
+                    self.text = f"{obj.name}: {obj.value}"
+                else:
+                    self.text = obj.name
+            else:
+                self.obj = None
+                self.text = obj  # which its text in this case
+            self.font = font
+            self.image = pg.Surface(self.font.size(self.text))
+            self.image.fill(BROWN)
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y   
+        
+        def check(self, mouse_pos):
+            if self.rect.collidepoint(mouse_pos):
+                return True
+            return False
+        
+        def inspect(self):
+            if self.obj:
+                return self.obj.inspect()
+            else:
+                return "A shiny UI element!"
+        
+        def drawt(self, screen, color):
+            text = self.font.render(self.text, True, color, (0, 0, 0))
+            screen.blit(text, (self.rect.x, self.rect.y))
+            
     
+    def check(self, mouse_pos):
+        msg = "Its either invisible or that is just the background of my inventory..."
+        for category in self.current_display:
+            for entry in category:
+                if entry.check(mouse_pos):
+                    msg = entry.inspect()
+        self.game.log.info(msg)
+    
+    def add_header(self, col, header):
+            h1 = Inventory.Entry(self.game, header, self.font, self.cur_x, self.cur_y)
+            self.cur_y += S_LINE_DIST
+            h2 = Inventory.Entry(self.game, "---------", self.font, self.cur_x, self.cur_y)
+            self.cur_y += S_LINE_DIST
+            self.current_display[col].append(h1)
+            self.current_display[col].append(h2)
+
     def update(self):
         """
         check the players inventory and update
@@ -52,56 +117,67 @@ class Inventory(WSCREEN):
         """
         # player inventory
         cur_inven = self.game.player.state.inventory
-        if len(cur_inven) != len(self.current_display[0]):
-            self.current_display[0] = []
-            for item in cur_inven:
-                self.current_display[0].append(item)
+        # reset with header
+        self.current_display[0] = []
+        self.add_header(0, "Inventory")
+        for item in cur_inven:
+            e = Inventory.Entry(self.game, item, self.font, self.cur_x, self.cur_y)
+            self.cur_y += S_LINE_DIST
+            self.current_display[0].append(e)
+        
+        # reset
+        self.cur_x += WIDTH/3
+        self.cur_y = self.y  
+
         # spells
         cur_spells = self.game.player.spells
-        if len(cur_spells) != len(self.current_display[1]):
-            self.current_display[1] = []
-            for spell in cur_spells:
-                self.current_display[1].append(spell)
-    
-    def draw_text_line(self, screen, text, color=WHITE):
-        text = self.font.render(text, True, color, (0, 0, 0))
-        screen.blit(text, (self.cur_x, self.cur_y))
-        self.cur_y += S_LINE_DIST
-    
-    def drawt(self, screen):
+        self.current_display[1] = []
+        self.add_header(1, "Spells")
+        for spell in cur_spells:
+            e = Inventory.Entry(self.game, spell, self.font, self.cur_x, self.cur_y)
+            self.cur_y += S_LINE_DIST
+            self.current_display[1].append(e)
+        
+        # reset
+        self.cur_x += (WIDTH/3)
+        self.cur_y = self.y
+        
+        # stats
+        stats = self.game.player.get_stats()
+        self.current_display[2] = []
+        self.add_header(2, "Stats")
+        for stat in stats:
+            e = Inventory.Entry(self.game, stat, self.font, self.cur_x, self.cur_y)
+            self.cur_y += S_LINE_DIST
+            self.current_display[2].append(e)
 
+        # reset cur_x and cur_y
+        self.cur_x = self.x
+        self.cur_y = self.y
+        self.starting = False
+
+    def drawt(self, screen):
         # draw the black backdrop
         screen.blit(self.image, (self.x, self.y))
 
-        # inventory header
-        self.draw_text_line(screen, "Inventory")
-        self.draw_text_line(screen, "---------")
-
         # line for each item
         for item in self.current_display[0]:
-            if item == self.game.player.equipped_item:
-                self.draw_text_line(screen, item.name, color=RED)
+            if item.obj and item.obj == self.game.player.equipped_item:
+                item.drawt(screen, RED)
             else:
-                self.draw_text_line(screen, item.name)
-        
-        # reset cur_x and cur_y for spells next
-        self.cur_x = self.x + WIDTH/2
-        self.cur_y = self.y
-
-        # spells header
-        self.draw_text_line(screen, "Spells")
-        self.draw_text_line(screen, "------")
+                item.drawt(screen, WHITE)
 
         # line for each spell
         for spell in self.current_display[1]:
-            if spell == self.game.player.equipped_spell:
-                self.draw_text_line(screen, spell.name, color=RED)
+            if spell.obj and spell.obj == self.game.player.equipped_spell:
+                spell.drawt(screen, RED)
             else:
-                self.draw_text_line(screen, spell.name)
+                spell.drawt(screen, WHITE)
+
+        for stat in self.current_display[2]:
+            stat.drawt(screen, WHITE)
+
         
-        # reset cur_x and cur_y completely
-        self.cur_x = self.x
-        self.cur_y = self.y
 
 
 

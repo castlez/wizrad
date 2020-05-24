@@ -52,6 +52,9 @@ S_Y = 0
 ###### Player ######
 
 PLAYER_START_HEALTH = 10
+PLAYER_START_STR = 3
+PLAYER_START_CON = 10
+PLAYER_START_INT = 3
 
 # Movement
 SPRINT_DELAY = 1
@@ -76,7 +79,6 @@ FIRING_SPEED = 15
 SPELL_BUFFER = 0
 
 SPELL_SIZE = int(TILESIZE/2)
-
 
 # Fire
 FIRE = "f"

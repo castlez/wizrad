@@ -160,6 +160,9 @@ class WSPELL(pg.sprite.Sprite):
 class Fire(WSPELL):
     name = "Fire Ball"
     elements = ["fire"]
+    @classmethod
+    def inspect(cls):
+        return "a Fire Ball spell"
     def __init__(self, game, target_pos):
         super().__init__(game, target_pos, color=RED)
         self.inspect_message = "a Fire Ball spell"

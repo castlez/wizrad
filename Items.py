@@ -13,6 +13,7 @@ class WITEM:
         pass
 
 class HealingPotion(WITEM):
+    inspect = lambda _: "A swirling red healing potion, I should use this if I'm hurt."
     def __init__(self, game):
         super().__init__(game)
         self.name = "Healing Potion"
@@ -22,14 +23,6 @@ class HealingPotion(WITEM):
         Heal the player HP_POT % of their health 
         rounded to the nearest integer
         """
-        max_health = self.game.player.state.max_health
-        cur_health = self.game.player.state.health
-        gained = int(max_health * HP_POT)
-        if cur_health + gained <= max_health:
-            new_health = cur_health + gained
-        else:
-            new_health = max_health
-        new_health = int(new_health)
-        self.game.player.state.health = new_health
-        self.game.log.info(f"I drank a healing potion gaining {gained} life (current health {new_health})")
-
+        self.game.player.heal_hp(HP_POT)
+        self.game.log.info(f"I drank a healing potion healing {int(HP_POT*100)}% of my health")
+    

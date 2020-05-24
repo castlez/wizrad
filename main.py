@@ -164,12 +164,19 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
-                    self.quit()
-                if event.key == pg.K_m:
-                    self.quit(save_map=True)
-                if not self.show_inventory:
+            if self.show_inventory:
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_i:
+                        self.show_inventory = False
+                elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                    mouse_pos = pg.mouse.get_pos()
+                    self.inventory.check(mouse_pos)
+            else:
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        self.quit()
+                    if event.key == pg.K_m:
+                        self.quit(save_map=True)
                     if event.key == pg.K_a:
                         self.player.move(dx=-1)
                     if event.key == pg.K_d:
@@ -187,25 +194,25 @@ class Game:
                         self.tick = True
                     if event.key == pg.K_RSHIFT or event.key == pg.K_LSHIFT:
                         self.player.use_item()
-                if event.key == pg.K_g:
-                    self.show_grid = not self.show_grid
-                if event.key == pg.K_l:
-                    self.player.collisions = not self.player.collisions
-                if event.key == pg.K_i:
-                    self.show_inventory = not self.show_inventory
-                if event.key == pg.K_o:
-                    print(f"group num walls = {len(self.walls)}")
-                if event.key == pg.K_DOWN:
-                    self.log.update_place(change=1)
-                if event.key == pg.K_UP:
-                    self.log.update_place(change=-1)
-            elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
-                mouse_pos = pg.mouse.get_pos()
-                self.player.inspect_space(mouse_pos)
-                self.tick = True
-            elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
-                mouse_pos = pg.mouse.get_pos()
-                self.player.interact_space(mouse_pos)
+                    if event.key == pg.K_g:
+                        self.show_grid = not self.show_grid
+                    if event.key == pg.K_l:
+                        self.player.collisions = not self.player.collisions
+                    if event.key == pg.K_i:
+                        self.show_inventory = True
+                    if event.key == pg.K_o:
+                        print(f"group num walls = {len(self.walls)}")
+                    if event.key == pg.K_DOWN:
+                        self.log.update_place(change=1)
+                    if event.key == pg.K_UP:
+                        self.log.update_place(change=-1)
+                elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                    mouse_pos = pg.mouse.get_pos()
+                    self.player.inspect_space(mouse_pos)
+                    self.tick = True
+                elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
+                    mouse_pos = pg.mouse.get_pos()
+                    self.player.interact_space(mouse_pos)
 
     def get_sprite_at(self, x, y):
         for sprite in self.all_sprites:

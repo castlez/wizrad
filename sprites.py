@@ -182,7 +182,7 @@ class Chest(WSPRITE):
         if self.adjacent_to_player(self.x, self.y):
             self.game.player.get_item(self.contents)
             self.game.current_floor.remove_inter(self)
-            return f"Got a {self.contents.name}! Current inventory: {self.game.player.state.inventory}"
+            return f"Got a {self.contents.name}!"
         else:
             return "The chest is to far away for me to open..."
 
