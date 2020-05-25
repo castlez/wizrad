@@ -34,6 +34,7 @@ class WSCREEN(pg.sprite.Sprite):
         # text stuff
         fonts = pg.font.get_fonts()
         self.font = pg.font.SysFont(fonts[0], S_TEXT_SIZE)
+        self.selected_font = pg.font.SysFont(fonts[0], S_TEXT_SIZE + 5)
         self.header_buff = S_TEXT_SIZE * 2  # headers are two lines long
     
     def update(self):
@@ -56,6 +57,7 @@ class Inventory(WSCREEN):
         self.cur_x = x
         self.cur_y = y + self.header_buff
         self.starting = True
+        self.select_buff = []
 
     class Entry(pg.sprite.Sprite):
         def __init__(self, game, obj, font, x, y):
@@ -76,13 +78,22 @@ class Inventory(WSCREEN):
             self.image.fill(BROWN)
             self.rect = self.image.get_rect()
             self.rect.x = x
-            self.rect.y = y   
+            self.rect.y = y 
+            self.selected = False  
         
         def check(self, mouse_pos):
             if self.rect.collidepoint(mouse_pos):
                 return True
             return False
         
+        def select(self, mouse_pos):
+            if self.rect.collidepoint(mouse_pos):
+                # check if ui element
+                if self.obj:
+                    self.selected = not self.selected
+                    return True
+            return False
+
         def inspect(self):
             if self.obj:
                 return self.obj.inspect()
@@ -90,7 +101,10 @@ class Inventory(WSCREEN):
                 return "A shiny UI element!"
         
         def drawt(self, screen, color):
-            text = self.font.render(self.text, True, color, (0, 0, 0))
+            if self.selected:
+                text = self.font.render(self.text, True, BLACK, YELLOW)
+            else:
+                text = self.font.render(self.text, True, color, (0, 0, 0))
             screen.blit(text, (self.rect.x, self.rect.y))
             
     
@@ -101,6 +115,27 @@ class Inventory(WSCREEN):
                 if entry.check(mouse_pos):
                     msg = entry.inspect()
         self.game.log.info(msg)
+    
+    def select(self, mouse_pos):
+        selected = None
+        for category in self.current_display:
+            for entry in category:
+                success = entry.select(mouse_pos)
+                if success:
+                    selected = entry
+                    break
+        if selected:
+            self.select_buff.append(selected)
+            print(f"select buff = {self.select_buff}")
+            if len(self.select_buff) == 2:
+                spell1 = self.select_buff[0]
+                spell2 = self.select_buff[1]
+                # get the name of the spell
+                for s in self.select_buff:
+                    s.selected = False
+                self.select_buff = []
+        else:
+            pass
     
     def add_header(self, col, header):
             h1 = Inventory.Entry(self.game, header, self.font, self.cur_x, self.cur_y)
@@ -115,15 +150,20 @@ class Inventory(WSCREEN):
         check the players inventory and update
         current display
         """
+        # reset cur_x and cur_y
+        self.cur_x = self.x
+        self.cur_y = self.y
         # player inventory
         cur_inven = self.game.player.state.inventory
-        # reset with header
-        self.current_display[0] = []
-        self.add_header(0, "Inventory")
-        for item in cur_inven:
-            e = Inventory.Entry(self.game, item, self.font, self.cur_x, self.cur_y)
-            self.cur_y += S_LINE_DIST
-            self.current_display[0].append(e)
+        # check if inventory has changed (+2 for headers)
+        if len(cur_inven) + 2 != len(self.current_display[0]):
+            # reset with header
+            self.current_display[0] = []
+            self.add_header(0, "Inventory")
+            for item in cur_inven:
+                e = Inventory.Entry(self.game, item, self.font, self.cur_x, self.cur_y)
+                self.cur_y += S_LINE_DIST
+                self.current_display[0].append(e)
         
         # reset
         self.cur_x += WIDTH/3
@@ -131,12 +171,13 @@ class Inventory(WSCREEN):
 
         # spells
         cur_spells = self.game.player.spells
-        self.current_display[1] = []
-        self.add_header(1, "Spells")
-        for spell in cur_spells:
-            e = Inventory.Entry(self.game, spell, self.font, self.cur_x, self.cur_y)
-            self.cur_y += S_LINE_DIST
-            self.current_display[1].append(e)
+        if len(cur_spells) + 2 != len(self.current_display[1]):
+            self.current_display[1] = []
+            self.add_header(1, "Spells")
+            for spell in cur_spells:
+                e = Inventory.Entry(self.game, spell, self.font, self.cur_x, self.cur_y)
+                self.cur_y += S_LINE_DIST
+                self.current_display[1].append(e)
         
         # reset
         self.cur_x += (WIDTH/3)

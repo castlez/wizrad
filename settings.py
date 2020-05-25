@@ -12,6 +12,7 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 BROWN = (168, 104, 50)
+LIGHTBLUE = (3, 244, 252)
 
 # Sizes
 TILESIZE = 32
@@ -91,9 +92,17 @@ SPELL_SIZE = int(TILESIZE/2)
 
 # Fire
 FIRE = "f"
+FCOLOR = RED
 FMIN = 20
 FMAX = 30
-FDAMAGE_RANGE = [0, 5]
+FDAMAGE_RANGE = [0, 7]
+
+# Ice
+ICE = "I"
+ICOLOR = LIGHTBLUE
+IMIN = 20
+IMAX = 30
+IDAMAGE_RANGE = [0, 4]
 
 ###### Enemies ######
 

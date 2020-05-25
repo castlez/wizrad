@@ -172,6 +172,9 @@ class Game:
                 elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
                     mouse_pos = pg.mouse.get_pos()
                     self.inventory.check(mouse_pos)
+                elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
+                    mouse_pos = pg.mouse.get_pos()
+                    self.inventory.select(mouse_pos)
             else:
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:

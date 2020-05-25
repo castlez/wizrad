@@ -11,6 +11,7 @@ class WSPELL(pg.sprite.Sprite):
     def __init__(self, game, mouse_pos, color=GREEN):
         self.groups = game.all_sprites, game.spells
         pg.sprite.Sprite.__init__(self, self.groups)
+        self.color = color
         self.game = game
         self.image = pg.Surface((SPELL_SIZE, SPELL_SIZE))
         # self.image = pg.transform.rotate(self.image, 0.45)
@@ -157,23 +158,81 @@ class WSPELL(pg.sprite.Sprite):
     def kill(self):
         super().kill()
 
+# Base Elements
 class Fire(WSPELL):
     name = "Fire Ball"
     elements = ["fire"]
-    
+
     @classmethod
     def inspect(cls):
         return "a Fire Ball spell"
 
     def __init__(self, game, target_pos):
-        super().__init__(game, target_pos, color=RED)
+        super().__init__(game, target_pos, color=FCOLOR)
         self.inspect_message = "a Fire Ball spell"
+        self.dmin = FDAMAGE_RANGE[0]
+        self.dmax = FDAMAGE_RANGE[1]
     
     def hit(self, target):
-        target.take_damage(random.randint(FDAMAGE_RANGE[0], FDAMAGE_RANGE[1]))
+        target.take_damage(random.randint(self.dmin, self.dmax))
         self.active = False
     
-    # TODO not getting called?
+    def drawt(self, screen):
+        if self.active:
+            self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
+            self.rect.y = SPELL_SIZE/4 + self.y * TILESIZE
+            im = pg.transform.rotozoom(self.image, 45, 1)
+            screen.blit(im, (self.rect.x, self.rect.y))
+
+class Ice(WSPELL):
+    name = "Icicle"
+    elements = ["ice"]
+    
+    @classmethod
+    def inspect(cls):
+        return "an Icicle spell"
+
+    def __init__(self, game, target_pos):
+        super().__init__(game, target_pos, color=ICOLOR)
+        self.inspect_message = "an Icicle spell"
+        self.dmin = IDAMAGE_RANGE[0]
+        self.dmax = IDAMAGE_RANGE[1]
+    
+    def hit(self, target):
+        target.take_damage(random.randint(self.dmin, self.dmax))
+        self.active = False
+    
+    def drawt(self, screen):
+        if self.active:
+            self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
+            self.rect.y = SPELL_SIZE/4 + self.y * TILESIZE
+            im = pg.transform.rotozoom(self.image, 45, 1)
+            screen.blit(im, (self.rect.x, self.rect.y))
+
+class CustomSpell(WSPELL):
+    name = "CustomSpell"
+    elements = []
+    
+    @classmethod
+    def inspect(cls):
+        return "a custom spell"
+
+    def __init__(self, game, target_pos, spell1, spell2, name):
+        # get the color first to init parent class
+        color = spell1.color + spell2.color
+        super().__init__(game, target_pos, color=color)
+        self.name = name
+
+        # mix the spells
+        self.elements = spell1.elements + spell2.elements
+        self.dmin = 0
+        self.dmax = int(spell1.dmax/2) + int(spell2.dmax/2)
+        self.inspect_message = f"an {name} spell"
+    
+    def hit(self, target):
+        target.take_damage(random.randint(self.dmin, self.dmax))
+        self.active = False
+    
     def drawt(self, screen):
         if self.active:
             self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
