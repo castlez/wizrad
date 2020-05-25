@@ -3,12 +3,12 @@ import pygame as pg
 from settings import *
 import time
 
-class WSPELL(pg.sprite.Sprite):
+class Spell(pg.sprite.Sprite):
     """
-    Parent class for spells
+    A Fired Spell Class
     """
-    name = "NAMELESS"
-    def __init__(self, game, mouse_pos, color=GREEN):
+    name = "A Magic Spell"
+    def __init__(self, game, mouse_pos, elements, color=GREEN):
         self.groups = game.all_sprites, game.spells
         pg.sprite.Sprite.__init__(self, self.groups)
         self.color = color
@@ -31,7 +31,7 @@ class WSPELL(pg.sprite.Sprite):
         self.moved = 0  # so the player doesnt die when they cast
         
         # filled out by child class
-        self.elements = []  
+        self.elements = elements
         self.inspect_message = "Its a spell of some kind"
         self.interact_message = "Not sure what I could do with that..."
         self.effect = None
@@ -127,7 +127,6 @@ class WSPELL(pg.sprite.Sprite):
                 if sprite != self:
                     if an or ab:
                         self.hit(sprite)
-                        self.active = False
                         return
             except:
                 pass
@@ -143,100 +142,50 @@ class WSPELL(pg.sprite.Sprite):
             return f"I equipped the spell '{self.name}'"
     
     def hit(self, target):
-        """
-        Anything that can hit something has this!
-        what happens when this hits something
-        """
-        print("WRONG ONE")
-        return False
+        dmg = self.get_damage()
+        target.take_damage(dmg)
+        self.active = False
     
-    def draw(self, screen):
-        """
-        """
-        print("BAD")
+    def get_damage(self):
+        dmg = 0
+        # fire and ice damage is applied flat
+        if FIRE in self.elements:
+            dmg += random.randint(FDAMAGE_RANGE[0], FDAMAGE_RANGE[1])
+        if ICE in self.elements:
+            dmg += random.randint(IDAMAGE_RANGE[0], IDAMAGE_RANGE[1])
+        print(f"dmg = {dmg}")
+        return dmg
+    
+    def drawt(self, screen):
+        if self.active:
+            self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
+            self.rect.y = SPELL_SIZE/4 + self.y * TILESIZE
+            im = pg.transform.rotozoom(self.image, 45, 1)
+            screen.blit(im, (self.rect.x, self.rect.y))
     
     def kill(self):
         super().kill()
 
-# Base Elements
-class Fire(WSPELL):
-    name = "Fire Ball"
-    elements = ["fire"]
-
-    @classmethod
-    def inspect(cls):
-        return "a Fire Ball spell"
-
-    def __init__(self, game, target_pos):
-        super().__init__(game, target_pos, color=FCOLOR)
-        self.inspect_message = "a Fire Ball spell"
-        self.dmin = FDAMAGE_RANGE[0]
-        self.dmax = FDAMAGE_RANGE[1]
+class KnownSpell:
+    """
+    Class for the knowledge of a spell
+    can cast this spell (duh)
+    """
+    def inspect(self):
+        return f"{self.name}: {self.description}"
     
-    def hit(self, target):
-        target.take_damage(random.randint(self.dmin, self.dmax))
-        self.active = False
-    
-    def drawt(self, screen):
-        if self.active:
-            self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
-            self.rect.y = SPELL_SIZE/4 + self.y * TILESIZE
-            im = pg.transform.rotozoom(self.image, 45, 1)
-            screen.blit(im, (self.rect.x, self.rect.y))
-
-class Ice(WSPELL):
-    name = "Icicle"
-    elements = ["ice"]
-    
-    @classmethod
-    def inspect(cls):
-        return "an Icicle spell"
-
-    def __init__(self, game, target_pos):
-        super().__init__(game, target_pos, color=ICOLOR)
-        self.inspect_message = "an Icicle spell"
-        self.dmin = IDAMAGE_RANGE[0]
-        self.dmax = IDAMAGE_RANGE[1]
-    
-    def hit(self, target):
-        target.take_damage(random.randint(self.dmin, self.dmax))
-        self.active = False
-    
-    def drawt(self, screen):
-        if self.active:
-            self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
-            self.rect.y = SPELL_SIZE/4 + self.y * TILESIZE
-            im = pg.transform.rotozoom(self.image, 45, 1)
-            screen.blit(im, (self.rect.x, self.rect.y))
-
-class CustomSpell(WSPELL):
-    name = "CustomSpell"
-    elements = []
-    
-    @classmethod
-    def inspect(cls):
-        return "a custom spell"
-
-    def __init__(self, game, target_pos, spell1, spell2, name):
-        # get the color first to init parent class
-        color = spell1.color + spell2.color
-        super().__init__(game, target_pos, color=color)
+    def __init__(self, name="a spell", elements="", description=""):
         self.name = name
+        self.elements = elements
+        self.description = description
+        self.spell = Spell
+        self.color = self.get_color()
+    
+    def get_color(self):
+        color = (0,0,0)
+        for e in self.elements:
+            color = tuple(sum(x) if sum(x)<=255 else 255 for x in zip(color, E_COLORS[e]))
+        return color
 
-        # mix the spells
-        self.elements = spell1.elements + spell2.elements
-        self.dmin = 0
-        self.dmax = int(spell1.dmax/2) + int(spell2.dmax/2)
-        self.inspect_message = f"an {name} spell"
-    
-    def hit(self, target):
-        target.take_damage(random.randint(self.dmin, self.dmax))
-        self.active = False
-    
-    def drawt(self, screen):
-        if self.active:
-            self.rect.x = SPELL_SIZE/4 + self.x * TILESIZE
-            self.rect.y = SPELL_SIZE/4 + self.y * TILESIZE
-            im = pg.transform.rotozoom(self.image, 45, 1)
-            screen.blit(im, (self.rect.x, self.rect.y))
-            
+    def shoot(self, game, target_pos):
+        return self.spell(game, target_pos, self.elements, color=self.color)

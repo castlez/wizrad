@@ -1,5 +1,7 @@
 import pygame as pg
+from pygame.locals import Rect
 from settings import *
+from spells import *
 from player import PlayerState
 import os
 
@@ -113,6 +115,8 @@ class Inventory(WSCREEN):
         for category in self.current_display:
             for entry in category:
                 if entry.check(mouse_pos):
+                    if isinstance(entry.obj, KnownSpell):
+                        self.game.player.equipped_spell = entry.obj
                     msg = entry.inspect()
         self.game.log.info(msg)
     
@@ -125,12 +129,26 @@ class Inventory(WSCREEN):
                     selected = entry
                     break
         if selected:
-            self.select_buff.append(selected)
-            print(f"select buff = {self.select_buff}")
+            if selected.obj:
+                if isinstance(selected.obj, KnownSpell):
+                    self.select_buff.append(selected)
+            # if we have two spells, craft a new spell with them
             if len(self.select_buff) == 2:
                 spell1 = self.select_buff[0]
                 spell2 = self.select_buff[1]
+
                 # get the name of the spell
+                name = self.get_spell_info("Spell Name")
+
+                # get the description of the spell and append
+                # the elements
+                desc = self.get_spell_info("Spell Description")
+                new_elements = spell1.obj.elements + spell2.obj.elements
+                desc += " " + str(new_elements)
+                new_spell = KnownSpell(name=name, 
+                                       elements=new_elements,
+                                       description=desc)
+                self.game.player.add_spell(new_spell)
                 for s in self.select_buff:
                     s.selected = False
                 self.select_buff = []
@@ -219,7 +237,57 @@ class Inventory(WSCREEN):
             stat.drawt(screen, WHITE)
 
         
+    def get_spell_info(self, prompt):
+        # set repeat rate to help text input
+        pg.key.set_repeat(SPRINT_DELAY + 200, SPRINT_SPEED)
+        start_text = prompt
+        text = start_text
+        font = pg.font.SysFont(None, 48)
+        img = font.render(text, True, RED)
+        
+        bkg = pg.Surface(img.get_size())
+        bkg.fill(BLACK)
+        max_size = img.get_size()
 
+        rect = img.get_rect()
+        rect.center = (WIDTH/2, HEIGHT/2)
+        cursor = Rect(rect.topright, (3, rect.height))
+
+        done = False
+        while not done:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.game.quit()
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RETURN:
+                        done = True
+                        break
+                    if text == start_text:
+                        text = ""
+                    if event.key == pg.K_BACKSPACE:
+                        if len(text)>0:
+                            text = text[:-1]
+                    else:
+                        text += event.unicode
+                    img = font.render(text, True, RED)
+                    text_size = img.get_size()
+                    if text_size > max_size:
+                        max_size = text_size
+                    bkg = pg.Surface(max_size)
+                    bkg.fill(BLACK)
+                    rect.size=text_size
+                    cursor.topleft = rect.topright
+            if done:
+                break
+            self.game.screen.blit(bkg, rect)
+            self.game.screen.blit(img, rect)
+            if time.time() % 1 > 0.5:
+                pg.draw.rect(self.game.screen, RED, cursor)
+            pg.display.update()
+        
+        # reset key rate
+        pg.key.set_repeat(SPRINT_DELAY, SPRINT_SPEED)
+        return text
 
 
 

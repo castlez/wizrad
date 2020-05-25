@@ -160,6 +160,8 @@ class Floor:
                     self.add_wall(Wall(self.game, lx, ly, gx, gy))
                 elif value == FIRE:
                     self.add_inter(BurningPile(self.game, lx, ly, gx, gy))
+                elif value == ICE:
+                    self.add_inter(IceBlock(self.game, lx, ly, gx, gy))
                 elif value == SKELETON:
                     sk = Skeleton(self.game, lx, ly, gx, gy)
                     self.add_enemy(sk)
@@ -179,6 +181,12 @@ class Floor:
             x, y = self.get_valid_pos()
             self.layout[x][y] = FIRE
         
+        # ice
+        num_ice = random.randint(FMIN, FMAX)
+        for _ in range(num_ice):
+            x, y = self.get_valid_pos()
+            self.layout[x][y] = ICE
+
         # skeletons
         num_skele = random.randint(SKMIN, SKMAX)
         for _ in range(num_skele):

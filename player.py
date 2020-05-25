@@ -149,7 +149,7 @@ class Player(pg.sprite.Sprite):
     def fire_spell(self, mouse_pos):
         if self.equipped_spell:
             self.is_firing = True
-            spell = self.equipped_spell(self.game, mouse_pos)
+            spell = self.equipped_spell.shoot(self.game, mouse_pos)
             self.active_spells.append(spell)
         else:
             self.game.log.info("I don't know any spells. Maybe I could study my surroundings...")

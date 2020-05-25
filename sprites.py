@@ -151,7 +151,7 @@ class BurningPile(WSPRITE):
     These give you fire
     """
     def __init__(self, game, x, y, gx, gy):
-        super().__init__(game, x, y, gx, gy, game.inters, color=RED)
+        super().__init__(game, x, y, gx, gy, game.inters, color=FCOLOR)
         self.inspect_message = "A magic fire, i better watch out. Hmm.. "\
                                "its interesting (right click to study)"
         self.name = "BurningPile"
@@ -161,8 +161,32 @@ class BurningPile(WSPRITE):
         if player.has_element("fire"):
             return "I already know how to wield fire magic"
         else:
-            player.add_spell(Fire)
+            fire_ball = KnownSpell(name="Fire Ball", 
+                                   elements=[FIRE],
+                                   description="Shoots a fireball at the cursor")
+            player.add_spell(fire_ball)
             return "I studied the pile and learned the secrets of fire magic!"
+
+class IceBlock(WSPRITE):
+    """
+    These give you Ice
+    """
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.inters, color=ICOLOR)
+        self.inspect_message = "An unwavering block of ice. Hmm.. "\
+                               "its interesting (right click to study)"
+        self.name = "IceBlock"
+        self.set_sign(ICE + SPAWNED)
+    
+    def interact(self, player):
+        if player.has_element("ice"):
+            return "I already know how to wield ice magic"
+        else:
+            fire_ball = KnownSpell(name="Icicle", 
+                                   elements=[ICE],
+                                   description="Shoots an icicle at the cursor")
+            player.add_spell(fire_ball)
+            return "I studied the block and learned the secrets of ice magic!"
 
 class Chest(WSPRITE):
     """

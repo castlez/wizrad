@@ -91,18 +91,24 @@ SPELL_BUFFER = 0
 SPELL_SIZE = int(TILESIZE/2)
 
 # Fire
-FIRE = "f"
+FIRE = "fire"
 FCOLOR = RED
 FMIN = 20
 FMAX = 30
-FDAMAGE_RANGE = [0, 7]
+FDAMAGE_RANGE = [1, 7]
 
 # Ice
-ICE = "I"
+ICE = "ice"
 ICOLOR = LIGHTBLUE
 IMIN = 20
 IMAX = 30
-IDAMAGE_RANGE = [0, 4]
+IDAMAGE_RANGE = [1, 4]
+
+# color map
+E_COLORS = {
+    FIRE: FCOLOR,
+    ICE: ICOLOR
+}
 
 ###### Enemies ######
 
