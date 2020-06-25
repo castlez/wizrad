@@ -14,6 +14,7 @@ from Floor import *
 from LogWindow import *
 from player import *
 from Screens import *
+from controls import *
 from dg.dungeonGenerationAlgorithms import RoomAddition
 
 
@@ -167,57 +168,57 @@ class Game:
                 self.quit()
             if self.show_inventory:
                 if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_i:
+                    if INVENTORY(event):
                         self.show_inventory = False
-                elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                elif INSPECT(event):
                     mouse_pos = pg.mouse.get_pos()
                     self.inventory.check(mouse_pos)
-                elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
+                elif INTERACT(event):
                     mouse_pos = pg.mouse.get_pos()
                     self.inventory.select(mouse_pos)
             else:
                 if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_ESCAPE:
+                    if QUIT_GAME(event):
                         self.quit()
-                    if event.key == pg.K_m:
+                    if QUIT_SAVE(event):
                         self.quit(save_map=True)
-                    if event.key == pg.K_a:
+                    if MOVE_LEFT(event):
                         self.player.move(dx=-1)
-                    if event.key == pg.K_d:
+                    if MOVE_RIGHT(event):
                         self.player.move(dx=1)
-                    if event.key == pg.K_w:
+                    if MOVE_UP(event):
                         self.player.move(dy=-1)
-                    if event.key == pg.K_s:
+                    if MOVE_DOWN(event):
                         self.player.move(dy=1)
-                    if event.key == pg.K_SPACE:
+                    if FIRE_SPELL(event):
                         # if not self.player.is_firing: TODO maybe limit this?
                         self.tick = True
                         mouse_pos = pg.mouse.get_pos()
                         self.player.fire_spell(mouse_pos)
-                    if event.key == pg.K_RETURN:
+                    if DO_TICK(event):
                         self.tick = True
-                    if event.key == pg.K_RSHIFT or event.key == pg.K_LSHIFT:
+                    if USE_ITEM(event):
                         self.player.use_item()
-                    if event.key == pg.K_g:
+                    if SHOW_GRID(event):
                         self.show_grid = not self.show_grid
-                    if event.key == pg.K_l:
+                    if GODMODE(event): 
                         self.godmode = not self.godmode
                         self.log.info(f"GODMODE ON: {self.godmode}")
-                    if event.key == pg.K_i:
+                    if INVENTORY(event):
                         self.show_inventory = True
-                    if event.key == pg.K_o:
+                    if PRINT_STATS(event):
                         print(f"group num walls = {len(self.walls)}")
-                    if event.key == pg.K_DOWN:
+                    if LOG_SCROLL_DOWN(event):
                         self.log.update_place(change=1)
-                    if event.key == pg.K_UP:
+                    if LOG_SCROLL_UP(event):
                         self.log.update_place(change=-1)
-                    if event.key == pg.K_h:
+                    if HELP(event):
                         self.help()
-                elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
+                elif INSPECT(event):
                     mouse_pos = pg.mouse.get_pos()
                     self.player.inspect_space(mouse_pos)
                     self.tick = True
-                elif event.type == pg.MOUSEBUTTONUP and event.button == 3:
+                elif INTERACT(event):
                     mouse_pos = pg.mouse.get_pos()
                     self.player.interact_space(mouse_pos)
 

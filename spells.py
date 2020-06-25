@@ -153,7 +153,6 @@ class Spell(pg.sprite.Sprite):
             dmg += random.randint(FDAMAGE_RANGE[0], FDAMAGE_RANGE[1])
         if ICE in self.elements:
             dmg += random.randint(IDAMAGE_RANGE[0], IDAMAGE_RANGE[1])
-        print(f"dmg = {dmg}")
         return dmg
     
     def drawt(self, screen):
@@ -184,7 +183,8 @@ class KnownSpell:
     def get_color(self):
         color = (0,0,0)
         for e in self.elements:
-            color = tuple(sum(x) if sum(x)<=255 else 255 for x in zip(color, E_COLORS[e]))
+            # funky magic to add the colors for each element together
+            color = tuple(sum(x)%256 for x in zip(color, E_COLORS[e]))
         return color
 
     def shoot(self, game, target_pos):
