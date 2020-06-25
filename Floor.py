@@ -29,6 +29,8 @@ class Floor:
         self.inters = []
         self.floor_number = floor_number
         self.walls = []
+        self.wall_locs = []
+
         self.all = []
         # current view port, [[xmin, xmax], [ymin, ymax]]
         self.current_view = [[0, 0],[0, 0]]
@@ -68,6 +70,7 @@ class Floor:
     def add_wall(self, wall):
         self.walls.append(wall)
         self.all.append(wall)
+        self.wall_locs.append((wall.gx, wall.gy))
     
     def add_inter(self, interactable):
         self.inters.append(interactable)
@@ -157,7 +160,8 @@ class Floor:
                 except:
                     return
                 if value == 1:
-                    self.add_wall(Wall(self.game, lx, ly, gx, gy))
+                    if not (gx, gy) in self.wall_locs:
+                        self.add_wall(Wall(self.game, lx, ly, gx, gy))
                 elif value == FIRE:
                     self.add_inter(BurningPile(self.game, lx, ly, gx, gy))
                 elif value == ICE:
@@ -174,7 +178,6 @@ class Floor:
         """
         Populates the map with stuff
         """
-        
         # fire
         num_fire = random.randint(FMIN, FMAX)
         for _ in range(num_fire):

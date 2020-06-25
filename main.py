@@ -207,7 +207,10 @@ class Game:
                     if INVENTORY(event):
                         self.show_inventory = True
                     if PRINT_STATS(event):
-                        print(f"group num walls = {len(self.walls)}")
+                        print("--- STATS -----")
+                        print(f"walls = {len(self.walls)}")
+                        print(f"enemies = {len(self.enemies)}")
+                        print("---------------")
                     if LOG_SCROLL_DOWN(event):
                         self.log.update_place(change=1)
                     if LOG_SCROLL_UP(event):
