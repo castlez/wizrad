@@ -844,7 +844,7 @@ class RoomAddition:
 			roomX,roomY,wallTile,direction, tunnelLength = self.placeRoom(room,mapWidth,mapHeight)
 			if roomX and roomY:
 				self.addRoom(roomX,roomY,room)
-				rooom_centers.append([roomX, roomY]
+				room_centers.append([roomX, roomY])
 				self.addTunnel(wallTile,direction,tunnelLength)
 				if len(self.rooms) >= self.MAX_NUM_ROOMS:
 					break

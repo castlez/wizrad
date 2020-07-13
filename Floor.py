@@ -27,6 +27,7 @@ class Floor:
         self.secret = []
         self.enemies = []
         self.inters = []
+        self.doors = []
         self.floor_number = floor_number
         self.walls = []
         self.wall_locs = []
@@ -85,6 +86,15 @@ class Floor:
         self.enemies.append(enemy)
         self.all.append(enemy)
     
+    def add_door(self, door):
+        self.doors.append(door)
+        self.all.append(door)
+    
+    def remove_door(self, door):
+        door.kill()
+        self.doors.remove(door)
+        self.all.remove(door)
+    
     def remove_enemy(self, enemy):
         enemy.kill()
         self.enemies.remove(enemy)
@@ -115,6 +125,11 @@ class Floor:
             if sprite.is_enemy:
                 if sprite.health < 0:
                     self.remove_enemy(sprite)
+            if sprite.is_door:
+                pos = [sprite.gx, sprite.gy]
+                if self.layout[pos[0]][pos[1]] == sprite.element + DEAD:
+                    print("REMOVING DOOR")
+                    self.remove_door(sprite)
     
     def update_seen(self):
         """
@@ -171,6 +186,8 @@ class Floor:
                     self.add_enemy(sk)
                 elif value == CHEST:
                     self.add_inter(Chest(self.game, lx, ly, gx, gy))
+                elif value in [FDOOR, IDOOR, EDOOR, ADOOR]:
+                    self.add_door(Door(DEM[value], self.game, lx, ly, gx, gy))
                 else:
                     pass
     
@@ -178,12 +195,25 @@ class Floor:
         """
         Returns the coordinates of all doors in a given room
         """
-        pass
+        return [start_pos]
 
     def populate_floor(self):
         """
         Populates the map with stuff
         """
+        #### Doors
+        doors = [FDOOR, IDOOR, ADOOR, EDOOR]
+        for rxy in self.room_centers:
+            doorways = self.find_doors(rxy)
+            if len(doorways) != 1:
+                continue
+            elif len(doors) == 0:
+                break
+            else:
+                dc = doorways[0]  # door coords
+                if self.layout[dc[0]][dc[1]] == 0:  # temp till i get door locs right
+                    self.layout[dc[0]][dc[1]] = doors.pop()
+
         # fire
         num_fire = random.randint(FMIN, FMAX)
         for _ in range(num_fire):

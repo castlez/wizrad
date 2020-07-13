@@ -37,6 +37,7 @@ class WSPRITE(pg.sprite.Sprite):
         self.visible = True
         self.blocking = False
         self.is_enemy = False
+        self.is_door = False
     
     def inspect(self):
         return self.inspect_message
@@ -148,10 +149,15 @@ class Wall(WSPRITE):
 class Door(WSPRITE):
     def __init__(self, element, game, x, y, gx, gy):
         # element is the element that UNLOCKS it
-        super().__init__(game, x, y, gx, gy, game.walls, color=self.get_color(element))
+        # super().__init__(game, x, y, gx, gy, game.doors, color=self.get_color(element))
+        super().__init__(game, x, y, gx, gy, game.doors, color=PINK)
         self.inspect_message = self.get_desc(element)
+        self.element = element
         self.blocking = True
+        self.is_door = True
+        self.locked = True
         self.name = "Door"
+        self.set_sign(self.element + SPAWNED)
     
     def get_desc(self, element):
         if element == FIRE:
@@ -164,20 +170,28 @@ class Door(WSPRITE):
             return "A digital door, needs a jolt to turn it on"
     
     def get_color(self, element):
-        if element == FIRE:
-            return BLUE
-        elif element == ACID:
-            return LIGHTGREY
-        elif element == ICE:
-            return RED
-        elif element == ELEC:
-            return YELLOW
+        # if element == FIRE:
+        #     return BLUE
+        # elif element == ACID:
+        #     return LIGHTGREY
+        # elif element == ICE:
+        #     return RED
+        # elif element == ELEC:
+        #     return YELLOW
+        return PINK
     
     def inspect(self):
-        return "I think its.. well, it might be.. yeah that is! Its a wall!"
+        return self.inspect_message
+
+    def interact(self, player):
+        if player.has_element(self.element):
+            self.set_sign(self.element + DEAD)
+            # TODO: make this personalized for each element
+            return "The magic leaps from my hands, unlocking the door!"
     
     def take_damage(self, amount):
-        self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
+        self.game.log.info("The spell fizzles on the door."\
+                           "Perhaps touching the door once i have the right spell will work...")
 
 # Interactables
 class BurningPile(WSPRITE):

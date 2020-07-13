@@ -49,6 +49,7 @@ class Game:
         self.inters = pg.sprite.Group()
         self.spells = pg.sprite.Group()
         self.playerg = pg.sprite.Group()
+        self.doors = pg.sprite.Group()
         self.screens = pg.sprite.Group()
         self.player = Player(self, PLAYER_X, PLAYER_Y)
         self.log = LogWindow(self, 3, 15)
@@ -125,6 +126,7 @@ class Game:
             self.spells.update()
             self.enemies.update()
             self.inters.update()
+            self.doors.update()
             self.current_floor.update_viewport(cur_g_x, cur_g_y)
             self.player.still = True
             self.tick = False
@@ -155,6 +157,8 @@ class Game:
                 inter.drawt(self.screen)
             for spell in self.spells:
                 spell.drawt(self.screen)
+            for door in self.doors:
+                door.drawt(self.screen)
             if self.show_grid:
                 self.draw_grid()
             self.player.drawt(self.screen)
@@ -208,8 +212,12 @@ class Game:
                         self.show_inventory = True
                     if PRINT_STATS(event):
                         print("--- STATS -----")
+                        print(f"player = {[self.player.gx, self.player.gy]}")
                         print(f"walls = {len(self.walls)}")
                         print(f"enemies = {len(self.enemies)}")
+                        print(f"doors:")
+                        for d in self.doors:
+                            print(f"{d.element}: {[d.gx, d.gy]}")
                         print("---------------")
                     if LOG_SCROLL_DOWN(event):
                         self.log.update_place(change=1)

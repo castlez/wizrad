@@ -14,6 +14,7 @@ YELLOW = (255, 255, 0)
 BROWN = (168, 104, 50)
 LIGHTBLUE = (3, 244, 252)
 BLUE = (0, 0, 255)
+PINK = (255, 51, 204)
 
 # Sizes
 TILESIZE = 32
@@ -93,6 +94,7 @@ SPELL_SIZE = int(TILESIZE/2)
 
 # Fire
 FIRE = "fire"
+FDOOR = "FD" 
 FCOLOR = RED
 FMIN = 20
 FMAX = 30
@@ -100,6 +102,7 @@ FDAMAGE_RANGE = [1, 7]
 
 # Ice
 ICE = "ice"
+IDOOR = "ID"
 ICOLOR = BLUE
 IMIN = 20
 IMAX = 30
@@ -107,6 +110,7 @@ IDAMAGE_RANGE = [1, 4]
 
 # acid
 ACID = "acid"
+ADOOR = "AD"
 ACOLOR = GREEN
 AMIN = 20
 AMAX = 30
@@ -114,10 +118,19 @@ ADAMAGE_RANGE = [1, 3]
 
 # electricity
 ELEC = "electricity"
+EDOOR = "ED"
 ECOLOR = GREEN
 EMIN = 20
 EMAX = 30
 EDAMAGE_RANGE = [3, 3]
+
+# Door element map
+DEM = {
+    FDOOR: FIRE,
+    IDOOR: ICE,
+    EDOOR: ELEC,
+    ADOOR: ACID
+}
 
 # color map
 E_COLORS = {
