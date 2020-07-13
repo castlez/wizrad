@@ -795,7 +795,7 @@ class RoomAddition:
 
 		self.ROOM_MAX_SIZE = 18 # max height and width for cellular automata rooms
 		self.ROOM_MIN_SIZE = 16 # min size in number of floor tiles, not height and width
-		self.MAX_NUM_ROOMS = 30
+		self.MAX_NUM_ROOMS = 15
 
 		self.SQUARE_ROOM_MAX_SIZE = 12
 		self.SQUARE_ROOM_MIN_SIZE = 6
@@ -855,27 +855,8 @@ class RoomAddition:
 		return self.level, room_centers
 
 	def generateRoom(self):
-		# select a room type to generate
-		# generate and return that room
-		if self.rooms:
-			#There is at least one room already
-			choice = random.random()
-
-			if choice <self.squareRoomChance:
-				room = self.generateRoomSquare()
-			elif self.squareRoomChance <= choice < (self.squareRoomChance+self.crossRoomChance):
-				room = self.generateRoomCross() 
-			else:
-				room = self.generateRoomCellularAutomata()
-
-		else: #it's the first room
-			choice = random.random()
-			if choice < self.cavernChance:
-				room = self.generateRoomCavern()
-			else:
-				room = self.generateRoomSquare()
-
-		return room
+		# MODIFIED this to just be square rooms
+		return self.generateRoomSquare()
 
 	def generateRoomCross(self):
 		roomHorWidth = int((random.randint(self.CROSS_ROOM_MIN_SIZE+2,self.CROSS_ROOM_MAX_SIZE))/2)*2

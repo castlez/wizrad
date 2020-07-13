@@ -195,7 +195,30 @@ class Floor:
         """
         Returns the coordinates of all doors in a given room
         """
-        return [start_pos]
+        cur = start_pos
+        fl = self.layout
+        opennings = []
+        
+        # first find the wall to the left
+        wall_hit = False
+        while not wall_hit:
+            check = [cur[0]-1, cur[1]]
+            if fl[check[0]][check[1]] == 1:
+                wall_hit = True
+            else:
+                cur = [cur[0]-1, cur[1]]
+        xmin = cur[0]
+
+        # now follow the wall collecting all opennings in a list
+        start = cur
+        done = False
+        while not done:
+            break
+
+        # TODO: since rooms are rectangles, find the xmax,xmin and ymax ymin and traverse
+        # TODO: to find Openings
+
+        return start_pos
 
     def populate_floor(self):
         """
