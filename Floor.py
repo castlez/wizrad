@@ -38,7 +38,7 @@ class Floor:
 
         # layout
         generator = RoomAddition()
-        self.layout = generator.generateLevel(MAP_WIDTH, MAP_HEIGHT)
+        self.layout, self.room_centers = generator.generateLevel(MAP_WIDTH, MAP_HEIGHT)
 
         # loot
         self.loot_table = None
@@ -173,6 +173,12 @@ class Floor:
                     self.add_inter(Chest(self.game, lx, ly, gx, gy))
                 else:
                     pass
+    
+    def find_doors(self, start_pos):
+        """
+        Returns the coordinates of all doors in a given room
+        """
+        pass
 
     def populate_floor(self):
         """

@@ -105,20 +105,6 @@ IMIN = 20
 IMAX = 30
 IDAMAGE_RANGE = [1, 4]
 
-# acid
-ACID = "acid"
-ACOLOR = GREEN
-AMIN = 20
-AMAX = 30
-ADAMAGE_RANGE = [1, 3]
-
-# electricity
-ELEC = "electricity"
-ECOLOR = GREEN
-EMIN = 20
-EMAX = 30
-EDAMAGE_RANGE = [3, 3]
-
 # color map
 E_COLORS = {
     FIRE: FCOLOR,

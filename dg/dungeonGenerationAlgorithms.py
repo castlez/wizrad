@@ -836,12 +836,15 @@ class RoomAddition:
 		self.addRoom(roomX,roomY,room)
 		
 		# generate other rooms
+		# and track room centers
+		room_centers = []
 		for i in range(self.buildRoomAttempts):
 			room = self.generateRoom()
 			# try to position the room, get roomX and roomY
 			roomX,roomY,wallTile,direction, tunnelLength = self.placeRoom(room,mapWidth,mapHeight)
 			if roomX and roomY:
 				self.addRoom(roomX,roomY,room)
+				rooom_centers.append([roomX, roomY]
 				self.addTunnel(wallTile,direction,tunnelLength)
 				if len(self.rooms) >= self.MAX_NUM_ROOMS:
 					break
@@ -849,7 +852,7 @@ class RoomAddition:
 		if self.includeShortcuts == True:
 			self.addShortcuts(mapWidth,mapHeight)
 
-		return self.level
+		return self.level, room_centers
 
 	def generateRoom(self):
 		# select a room type to generate

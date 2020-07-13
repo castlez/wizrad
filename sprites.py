@@ -145,6 +145,40 @@ class Wall(WSPRITE):
     def take_damage(self, amount):
         self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
 
+class Door(WSPRITE):
+    def __init__(self, element, game, x, y, gx, gy):
+        # element is the element that UNLOCKS it
+        super().__init__(game, x, y, gx, gy, game.walls, color=self.get_color(element))
+        self.inspect_message = self.get_desc(element)
+        self.blocking = True
+        self.name = "Door"
+    
+    def get_desc(self, element):
+        if element == FIRE:
+            return "A frozen door, needs to be heated up"
+        elif element == ACID:
+            return "A steel door, needs to be disolved"
+        elif element == ICE:
+            return "A burning door, needs to cool off"
+        elif element == ELEC:
+            return "A digital door, needs a jolt to turn it on"
+    
+    def get_color(self, element):
+        if element == FIRE:
+            return BLUE
+        elif element == ACID:
+            return LIGHTGREY
+        elif element == ICE:
+            return RED
+        elif element == ELEC:
+            return YELLOW
+    
+    def inspect(self):
+        return "I think its.. well, it might be.. yeah that is! Its a wall!"
+    
+    def take_damage(self, amount):
+        self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
+
 # Interactables
 class BurningPile(WSPRITE):
     """
