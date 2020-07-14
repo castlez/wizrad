@@ -201,29 +201,29 @@ class Floor:
         """
 
         fl = self.layout
-        walls = []
+        wallss = []
 
         # right, left, down, up
         if fl[gx+1][gy] == WALL:
-            walls.append((1, 0))
+            wallss.append([1, 0])
         if fl[gx-1][gy] == WALL:
-            walls.append((-1, 0))
+            wallss.append([-1, 0])
         if fl[gx][gy+1] == WALL:
-            walls.append((0, 1))
+            wallss.append([0, 1])
         if fl[gx][gy-1] == WALL:
-            walls.append((0, -1))
+            wallss.append([0, -1])
         
         # diagonals
         if fl[gx+1][gy+1] == WALL:
-            walls.append((1, 1))
+            wallss.append([1, 1])
         if fl[gx-1][gy+1] == WALL:
-            walls.append((-1, 1))
+            wallss.append([-1, 1])
         if fl[gx+1][gy-1] == WALL:
-            walls.append((1, -1))
+            wallss.append([1, -1])
         if fl[gx-1][gy-1] == WALL:
-            walls.append((-1, -1))
+            wallss.append([-1, -1])
         
-        return walls
+        return wallss
         
 
     def find_doorways(self, start_pos):
@@ -257,40 +257,51 @@ class Floor:
             coordy = start_pos[1]
             found = False
             while not found:
-                adjacent = self.get_adjacent_walls(coordx, coordy)
-                if len(adjacent) > 0:
-                    for adj in adjacent:
-                        if adj[0] == 1:
-                            xmax = coordx
-                            found_bounds[0] = 1
-                            found = True
-                        elif adj[0] == -1:
-                            xmin = coordx
-                            found_bounds[1] = 1
-                            found = True
-                        if adj[1] == 1:
-                            ymax = coordy
-                            found_bounds[2] = 1
-                            found = True
-                        elif adj[1] == -1:
-                            ymin = coordy
-                            found_bounds[3] = 1
-                            found = True
-                print(f"total bounds found = {sum(found_bounds)}, {found_bounds}")
-                print(f"cur pos = {coordx}, {coordy}")
+                # adjacent = self.get_adjacent_walls(coordx, coordy)
+                # if len(adjacent) > 0:
+                #     for adj in adjacent:
+                #         if adj == [1, 0] and found_bounds[0] != 1:
+                #             xmax = coordx
+                #             found_bounds[0] = 1
+                #             found = True
+                #         if adj == [-1, 0] and found_bounds[1] != 1:
+                #             xmin = coordx
+                #             found_bounds[1] = 1
+                #             found = True
+                #         if adj == [0, 1] and found_bounds[2] != 1:
+                #             ymax = coordy
+                #             found_bounds[2] = 1
+                #             found = True
+                #         if adj == [0, -1] and found_bounds[3] != 1:
+                #             ymin = coordy
+                #             found_bounds[3] = 1
+                #             found = True
+                # print(f"total bounds found = {sum(found_bounds)}, {found_bounds}")
+                # print(f"cur pos = {coordx}, {coordy}")
                 # move to the next space
                 new_coords = add_tuples([coordx, coordy], direction)
-                coordx = new_coords[0]
-                coordy = new_coords[1]
-
-            if sum(found_bounds) == 4:
-                break
+                if fl[new_coords[0]][new_coords[1]] == WALL:
+                    if direction == [1, 0] and not xmax:
+                        xmax = coordx
+                        break
+                    elif direction == [-1, 0] and not xmin:
+                        xmin = coordx
+                        break
+                    elif direction == [0, 1] and not ymax:
+                        ymax = coordy
+                        break
+                    elif direction == [0, -1] and not ymin:
+                        ymin = coordy
+                        break
+                else:
+                    coordx = new_coords[0]
+                    coordy = new_coords[1]
         
-        if sum(found_bounds) == 4:
-                print("FOUND ALL BOUNDS")
+        if xmax and xmin and ymax and ymin:
+                pass
         else:
             print(f"FAILED to find bounds of room at {start_pos}")
-            return
+            return []
         
         if fl[xmin-1][ymin] == 1 and fl[xmin-1][ymin-1] == 1 and fl[xmin][ymin-1] == 1:
             print(f"({xmin}, {ymin}) is a corner!")
@@ -325,9 +336,10 @@ class Floor:
                 break
             doorways = self.find_doorways(rxy)
             if doorways:
-                if len(doorways) >= 1:
+                if len(doorways) == 1:
                     dc = doorways[0]  # door coords
                     self.layout[dc[0]][dc[1]] = doors.pop()
+                    print(f"door at {dc}")
                 elif len(doorways) == 0:
                     break
                 else:
