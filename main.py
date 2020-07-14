@@ -213,6 +213,7 @@ class Game:
                     if PRINT_STATS(event):
                         print("--- STATS -----")
                         print(f"player = {[self.player.gx, self.player.gy]}")
+                        print(f"player(txt) = {[self.player.gy-1, self.player.gx-1]}")
                         print(f"walls = {len(self.walls)}")
                         print(f"enemies = {len(self.enemies)}")
                         print(f"doors:")

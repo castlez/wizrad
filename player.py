@@ -48,7 +48,7 @@ class Player(pg.sprite.Sprite):
     
     def take_damage(self, source, amount):
         if self.game.godmode:
-            self.game.log.info(f"Woulda taken {amount} dmg if not for godmode")
+            #self.game.log.info(f"Woulda taken {amount} dmg if not for godmode")
             return
         self.state.Health.value -= amount
         self.game.log.info(f"Hit by {source.name} for {amount} damage")

@@ -25,7 +25,7 @@ HEIGHT = TILESIZE * GRIDHEIGHT
 TEXTBOX_HEIGHT = 10
 
 
-# full mape size (for generation)
+# full map size (for generation)
 MAP_WIDTH = 80
 MAP_HEIGHT = 60
 
@@ -77,6 +77,7 @@ SPRINT_SPEED = 100
 CHEST = "ch"
 CHMIN = 20
 CHMAX = 30
+WALL = 1
 
 ###### Items ######
 

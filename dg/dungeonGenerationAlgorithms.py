@@ -20,14 +20,14 @@ import libtcodpy as libtcod
 import random
 from math import sqrt
 from collections import OrderedDict
-from settings import *
 
-# SCREEN_WIDTH = 64
-# SCREEN_HEIGHT = 48
-# TEXTBOX_HEIGHT = 10
+if __name__ == "__main__":
+	SCREEN_WIDTH = 64
+	SCREEN_HEIGHT = 48
+	TEXTBOX_HEIGHT = 10
 
-# MAP_WIDTH = SCREEN_WIDTH
-# MAP_HEIGHT = SCREEN_HEIGHT - TEXTBOX_HEIGHT
+	MAP_WIDTH = SCREEN_WIDTH
+	MAP_HEIGHT = SCREEN_HEIGHT - TEXTBOX_HEIGHT
 
 USE_PREFABS = False
 
@@ -128,10 +128,15 @@ class UserInterface:
 		# ==== Render Level ====
 		for y in range(MAP_HEIGHT):
 			for x in range(MAP_WIDTH):
-				if self.map.level[x][y] == 1:
-					libtcod.console_put_char_ex(self.con, x, y, '#', self.color_light_wall_fore, self.color_light_wall_back)
-				else:
-					libtcod.console_put_char_ex(self.con, x, y, '.', self.color_light_ground_fore, self.color_light_ground_back)
+				try:
+					if self.map.level[x][y] == 1:
+						libtcod.console_put_char_ex(self.con, x, y, '#', self.color_light_wall_fore, self.color_light_wall_back)
+					else:
+						libtcod.console_put_char_ex(self.con, x, y, '.', self.color_light_ground_fore, self.color_light_ground_back)
+				except:
+					print(f"x,y = {x},{y}")
+					print(f"len(self.map.level) = {len(self.map.level)}")
+					print(f"len(self.map.level[0]) = {len(self.map.level[x])}")
 	
 		#TODO: Print Instructions to Screen
 		self.renderTextBox()
@@ -795,7 +800,7 @@ class RoomAddition:
 
 		self.ROOM_MAX_SIZE = 18 # max height and width for cellular automata rooms
 		self.ROOM_MIN_SIZE = 16 # min size in number of floor tiles, not height and width
-		self.MAX_NUM_ROOMS = 15
+		self.MAX_NUM_ROOMS = 30
 
 		self.SQUARE_ROOM_MAX_SIZE = 12
 		self.SQUARE_ROOM_MIN_SIZE = 6
@@ -851,8 +856,12 @@ class RoomAddition:
 
 		if self.includeShortcuts == True:
 			self.addShortcuts(mapWidth,mapHeight)
-
-		return self.level, room_centers
+			print("running as main")
+		if __name__ == "__main__":
+			return self.level
+		else:
+			print("running as api")
+			return self.level, room_centers
 
 	def generateRoom(self):
 		# MODIFIED this to just be square rooms
