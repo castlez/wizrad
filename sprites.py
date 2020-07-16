@@ -206,7 +206,7 @@ class BurningPile(WSPRITE):
         self.set_sign(FIRE + SPAWNED)
     
     def interact(self, player):
-        if player.has_element("fire"):
+        if player.has_element(FIRE):
             return "I already know how to wield fire magic"
         else:
             fire_ball = KnownSpell(name="Fire Ball", 
@@ -227,14 +227,60 @@ class IceBlock(WSPRITE):
         self.set_sign(ICE + SPAWNED)
     
     def interact(self, player):
-        if player.has_element("ice"):
+        if player.has_element(ICE):
             return "I already know how to wield ice magic"
         else:
-            fire_ball = KnownSpell(name="Icicle", 
+            icecycle = KnownSpell(name="Icicle",
                                    elements=[ICE],
                                    description="Shoots an icicle at the cursor")
-            player.add_spell(fire_ball)
+            player.add_spell(icecycle)
             return "I studied the block and learned the secrets of ice magic!"
+
+
+class AcidPuddle(WSPRITE):
+    """
+    These give you acid
+    """
+
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.inters, color=ACOLOR)
+        self.inspect_message = "A puddle of bubbling acid. Hmm.. " \
+                               "its interesting (right click to study)"
+        self.name = "AcidPuddle"
+        self.set_sign(ACID + SPAWNED)
+
+    def interact(self, player):
+        if player.has_element(ACID):
+            return "I already know how to wield acid magic"
+        else:
+            acid_splash = KnownSpell(name="Acid Splash",
+                                   elements=[ACID],
+                                   description="Shoots an acid at the cursor")
+            player.add_spell(acid_splash)
+            return "I studied the puddle and learned the secrets of acid magic!"
+
+class ArcingArtifact(WSPRITE):
+    """
+    These give you acid
+    """
+
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.inters, color=ECOLOR)
+        self.inspect_message = "An electrified artifact. Hmm.. " \
+                               "its interesting (right click to study)"
+        self.name = "ArcingArtifact"
+        self.set_sign(ELEC + SPAWNED)
+
+    def interact(self, player):
+        if player.has_element(ELEC):
+            return "I already know how to wield electric magic"
+        else:
+            sparks = KnownSpell(name="sparks",
+                                   elements=[ELEC],
+                                   description="Shoots electric sparks at the cursor")
+            player.add_spell(sparks)
+            return "I studied the puddle and learned the secrets of acid magic!"
+
 
 class Chest(WSPRITE):
     """

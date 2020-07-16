@@ -51,17 +51,17 @@ class Game:
         self.playerg = pg.sprite.Group()
         self.doors = pg.sprite.Group()
         self.screens = pg.sprite.Group()
-        self.player = Player(self, PLAYER_X, PLAYER_Y)
         self.log = LogWindow(self, 3, 15)
         self.inventory = Inventory(self, 0, 0)
 
         # first floor (TODO start screen)
         self.current_floor = Floor(self, 1)
         self.current_floor.populate_floor()
+        self.player = Player(self, PLAYER_X, PLAYER_Y)
 
-        # put the player in a random place
-        gx, gy = self.current_floor.get_valid_pos()
-        self.player.update_global_position(gx, gy)
+        # # put the player in a random place
+        # gx, gy = self.current_floor.get_valid_pos()
+        # self.player.update_global_position(gx, gy)
 
         # start the engines
         self.tick = True
@@ -213,7 +213,6 @@ class Game:
                     if PRINT_STATS(event):
                         print("--- STATS -----")
                         print(f"player = {[self.player.gx, self.player.gy]}")
-                        print(f"player(txt) = {[self.player.gy+1, self.player.gx+1]}")
                         print(f"walls = {len(self.walls)}")
                         print(f"enemies = {len(self.enemies)}")
                         print(f"doors:")

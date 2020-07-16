@@ -30,8 +30,13 @@ class Player(pg.sprite.Sprite):
         self.dy = 0
         
         # position in the level
-        self.gx = 0
-        self.gy = 0
+        fl = self.game.current_floor.layout
+        for x in range(MAP_WIDTH):
+            for y in range(MAP_HEIGHT):
+                if fl[x][y] == PLAYER:
+                        self.gx = x
+                        self.gy = y
+
         self.still = True
 
         self.collisions = True

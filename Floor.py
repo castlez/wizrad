@@ -1,17 +1,17 @@
 """
 Floor stuff
 """
-from settings import *
-from sprites import *
-from Items import *
 import os
-import json
 import random
-import traceback
 
+from Items import HealingPotion
 from dg.dungeonGenerationAlgorithms import RoomAddition
+from settings import *
+from settings import FIRE, ACID, ICE, ELEC
 
- # add two tuples component wise (WHY DOESNT THIS ALREADY EXIST?!)
+# add two tuples component wise (WHY DOESNT THIS ALREADY EXIST?!)
+from sprites import Wall, BurningPile, IceBlock, Skeleton, Chest, Door, AcidPuddle, ArcingArtifact
+
 add_tuples = lambda t1, t2: [t1[0]+t2[0], t1[1]+t2[1]]
 
 class Floor:
@@ -184,6 +184,10 @@ class Floor:
                     self.add_inter(BurningPile(self.game, lx, ly, gx, gy))
                 elif value == ICE:
                     self.add_inter(IceBlock(self.game, lx, ly, gx, gy))
+                elif value == ACID:
+                    self.add_inter(AcidPuddle(self.game, lx, ly, gx, gy))
+                elif value == ELEC:
+                    self.add_inter(ArcingArtifact(self.game, lx, ly, gx, gy))
                 elif value == SKELETON:
                     sk = Skeleton(self.game, lx, ly, gx, gy)
                     self.add_enemy(sk)
@@ -193,53 +197,13 @@ class Floor:
                     self.add_door(Door(DEM[value], self.game, lx, ly, gx, gy))
                 else:
                     pass
-    
-    def get_adjacent_walls(self, gx, gy):
-        """
-        returns a list of (dx, dy) tuples detailing
-        the directions of any walls, empty if none
-        """
-
-        fl = self.layout
-        wallss = []
-
-        # right, left, down, up
-        if fl[gx+1][gy] == WALL:
-            wallss.append([1, 0])
-        if fl[gx-1][gy] == WALL:
-            wallss.append([-1, 0])
-        if fl[gx][gy+1] == WALL:
-            wallss.append([0, 1])
-        if fl[gx][gy-1] == WALL:
-            wallss.append([0, -1])
         
-        # diagonals
-        if fl[gx+1][gy+1] == WALL:
-            wallss.append([1, 1])
-        if fl[gx-1][gy+1] == WALL:
-            wallss.append([-1, 1])
-        if fl[gx+1][gy-1] == WALL:
-            wallss.append([1, -1])
-        if fl[gx-1][gy-1] == WALL:
-            wallss.append([-1, -1])
-        
-        return wallss
-        
-
     def find_doorways(self, start_pos):
         """
         Returns the coordinates of all doors in a given room
         """
         fl = self.layout
-        with open(os.getcwd() + "\\debug.txt", 'w') as f:
-            mp = ""
-            for y in range(MAP_HEIGHT):
-                for x in range(MAP_WIDTH):
-                    w = fl[x][y] if fl[x][y] == 1 else "."
-                    mp += f"{w}"
-                mp += "\n"
-            f.write(mp)
-        doorways = []
+
 
         # bounds for traversal (perimeter of room)
         xmin = None
@@ -249,6 +213,7 @@ class Floor:
         
         # track the bounds we've found around
         found_bounds = [0,0,0,0]
+        doorways = []
         
         # Find the bounds of the room (up: ymin, down: ymax, left: xmin, right:xmax)
         for direction in [[1,0], [-1,0], [0,1], [0,-1]]:
@@ -257,40 +222,18 @@ class Floor:
             coordy = start_pos[1]
             found = False
             while not found:
-                # adjacent = self.get_adjacent_walls(coordx, coordy)
-                # if len(adjacent) > 0:
-                #     for adj in adjacent:
-                #         if adj == [1, 0] and found_bounds[0] != 1:
-                #             xmax = coordx
-                #             found_bounds[0] = 1
-                #             found = True
-                #         if adj == [-1, 0] and found_bounds[1] != 1:
-                #             xmin = coordx
-                #             found_bounds[1] = 1
-                #             found = True
-                #         if adj == [0, 1] and found_bounds[2] != 1:
-                #             ymax = coordy
-                #             found_bounds[2] = 1
-                #             found = True
-                #         if adj == [0, -1] and found_bounds[3] != 1:
-                #             ymin = coordy
-                #             found_bounds[3] = 1
-                #             found = True
-                # print(f"total bounds found = {sum(found_bounds)}, {found_bounds}")
-                # print(f"cur pos = {coordx}, {coordy}")
-                # move to the next space
                 new_coords = add_tuples([coordx, coordy], direction)
                 if fl[new_coords[0]][new_coords[1]] == WALL:
                     if direction == [1, 0] and not xmax:
                         xmax = coordx
                         break
-                    elif direction == [-1, 0] and not xmin:
+                    if direction == [-1, 0] and not xmin:
                         xmin = coordx
                         break
-                    elif direction == [0, 1] and not ymax:
+                    if direction == [0, 1] and not ymax:
                         ymax = coordy
                         break
-                    elif direction == [0, -1] and not ymin:
+                    if direction == [0, -1] and not ymin:
                         ymin = coordy
                         break
                 else:
@@ -309,7 +252,12 @@ class Floor:
         # now that we have the bounds, use them to search for doorways
         
         # first fix y and traverse x
+        bh = "$"  # set to empty string to remove bounding
+        bv = "$"  # set to empty string to remove bounding
         for x in range(xmin, xmax+1):
+            if bh:
+                self.layout[x][ymin] = bh
+                self.layout[x][ymax] = bh
             if fl[x][ymin-1] == 0:
                 doorways.append([x, ymin-1])
             elif fl[x][ymax+1] == 0:
@@ -317,12 +265,21 @@ class Floor:
             
         # next fix x and and traverse y
         for y in range(ymin, ymax+1):
+            if bv:
+                self.layout[xmin][y] = bv
+                self.layout[xmax][y] = bv
             if fl[xmin-1][y] == 0:
                 doorways.append([xmin-1, y])
             elif fl[xmax+1][y] == 0:
                 doorways.append([xmax+1, y])
-        
-        return doorways
+
+        # lastly get the center of the room
+        xc = xmin
+        yc = ymin
+        center_x = xc
+        center_y = yc
+
+        return doorways, [center_x, center_y]
 
     def populate_floor(self):
         """
@@ -330,32 +287,47 @@ class Floor:
         """
         #### Doors
         doors = [FDOOR, IDOOR, ADOOR, EDOOR]
+        playerx = None
+        playery = None
         for rxy in self.room_centers:
             if len(doors) == 0:
                 # placed all the doors
                 break
-            doorways = self.find_doorways(rxy)
+            doorways, center = self.find_doorways(rxy)
             if doorways:
                 if len(doorways) == 1:
-                    dc = doorways[0]  # door coords
-                    self.layout[dc[0]][dc[1]] = doors.pop()
+                    dc = doorways[0]  
+                    dtype = doors.pop()
+                    etype = DEM[dtype]
+                    print(f"placing {etype} at {rxy}")
+                    ex = rxy[0]
+                    ey = rxy[1]
+                    if etype == FIRE:
+                        self.layout[center[0]][center[1]] = FIRE
+                        self.layout[center[0]-1][center[1]] = PLAYER
+                    if etype == ICE:
+                        self.layout[ex][ey] = ACID
+                    if etype == ACID:
+                        self.layout[ex][ey] = ELEC
+                    if etype == ELEC:
+                        self.layout[ex][ey] = CRYSTAL
+
+                    self.layout[dc[0]][dc[1]] = dtype
                     print(f"door at {dc}")
                 elif len(doorways) == 0:
                     break
                 else:
                     continue
-
-        # fire
-        num_fire = random.randint(FMIN, FMAX)
-        for _ in range(num_fire):
-            x, y = self.get_valid_pos()
-            self.layout[x][y] = FIRE
-        
-        # ice
-        num_ice = random.randint(FMIN, FMAX)
-        for _ in range(num_ice):
-            x, y = self.get_valid_pos()
-            self.layout[x][y] = ICE
+        print("done with doors and elements")
+        fl = self.layout
+        with open(os.getcwd() + "\\scraps\\debug.txt", 'w') as f:
+            mp = ""
+            for y in range(MAP_HEIGHT):
+                for x in range(MAP_WIDTH):
+                    w = "." if fl[x][y] == 0 else fl[x][y]
+                    mp += f"{w}"
+                mp += "\n"
+            f.write(mp)
 
         # skeletons
         num_skele = random.randint(SKMIN, SKMAX)

@@ -147,12 +147,17 @@ class Spell(pg.sprite.Sprite):
         self.active = False
     
     def get_damage(self):
-        dmg = 0
+        dmg = -1
         # fire and ice damage is applied flat
         if FIRE in self.elements:
             dmg += random.randint(FDAMAGE_RANGE[0], FDAMAGE_RANGE[1])
         if ICE in self.elements:
             dmg += random.randint(IDAMAGE_RANGE[0], IDAMAGE_RANGE[1])
+        if ACID in self.elements:
+            dmg += random.randint(ADAMAGE_RANGE[0], ADAMAGE_RANGE[1])
+        if ELEC in self.elements:
+            dmg += random.randint(EDAMAGE_RANGE[0], EDAMAGE_RANGE[1])
+
         return dmg
     
     def drawt(self, screen):

@@ -39,7 +39,7 @@ TIME_INTERVAL = 0.5
 # Viewport
 PLAYER_X = int(GRIDWIDTH/2)
 PLAYER_Y = int(GRIDHEIGHT/2) - 1  # -1 to account for log window
-
+PLAYER = "@"
 # Log
 VIS_LOG_LINES = 3
 TEXT_SIZE = 18
@@ -74,14 +74,18 @@ SPRINT_SPEED = 100
 
 ###### Interactables ######
 
-CHEST = "ch"
+CHEST = "C"
 CHMIN = 20
 CHMAX = 30
-WALL = 1
 
 ###### Items ######
 
 HP_POT = 0.4  # heal the player 40%
+CRYSTAL = "+"  # the point of the entire game, get this and win instantly
+
+###### Objects (not alive) ######
+WALL = 1
+FLOOR = "."
 
 ###### Elements/Spells ######
 
@@ -94,7 +98,7 @@ SPELL_BUFFER = 0
 SPELL_SIZE = int(TILESIZE/2)
 
 # Fire
-FIRE = "fire"
+FIRE = "F"
 FDOOR = "FD" 
 FCOLOR = RED
 FMIN = 20
@@ -102,7 +106,7 @@ FMAX = 30
 FDAMAGE_RANGE = [1, 7]
 
 # Ice
-ICE = "ice"
+ICE = "i"
 IDOOR = "ID"
 ICOLOR = BLUE
 IMIN = 20
@@ -110,7 +114,7 @@ IMAX = 30
 IDAMAGE_RANGE = [1, 4]
 
 # acid
-ACID = "acid"
+ACID = "a"
 ADOOR = "AD"
 ACOLOR = GREEN
 AMIN = 20
@@ -118,9 +122,9 @@ AMAX = 30
 ADAMAGE_RANGE = [1, 3]
 
 # electricity
-ELEC = "electricity"
+ELEC = "e"
 EDOOR = "ED"
-ECOLOR = GREEN
+ECOLOR = LIGHTBLUE
 EMIN = 20
 EMAX = 30
 EDAMAGE_RANGE = [3, 3]
@@ -136,7 +140,9 @@ DEM = {
 # color map
 E_COLORS = {
     FIRE: FCOLOR,
-    ICE: ICOLOR
+    ICE: ICOLOR,
+    ACID: ACOLOR,
+    ELEC: ECOLOR
 }
 
 ###### Enemies ######
@@ -153,3 +159,5 @@ SKMAX = 30
 SKLIFE = 5
 SKDAMAGE_RANGE = [2, 4]
 SK_XP = 8   
+
+
