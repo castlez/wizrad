@@ -224,25 +224,48 @@ class Floor:
                     return r
 
         return None
+    
+    def find_doors(self, room):
+        """
+        HACK figure it out the dumb dumb way
+        :param room: 
+        :return: 
+        """
+        tl = room["corners"][0]
+        tr = room["corners"][1]
+        bl = room["corners"][2]
+        br = room["corners"][3]
+        doors = []
+        for x in range(tl[0], tr[0]):
+            if self.layout[x][tl[1]-1] == 0:
+                doors.append([x, tl[1]-1])
+            if self.layout[x][bl[1]+1] == 0:
+                doors.append([x, bl[1]+1])
+        for y in range(tl[1], bl[1]):
+            if self.layout[tl[0]-1][y] == 0:
+                doors.append([tl[0]-1, y])
+            if self.layout[tr[0]+1][y] == 0:
+                doors.append([tr[0]+1, y])
+        return doors
+
+
     def populate_floor(self):
         """
         Populates the map with stuff
         """
         #### Doors
-        doors = [FDOOR, IDOOR, ADOOR, EDOOR, FDOOR]
+        door_types = [FDOOR, IDOOR, ADOOR, EDOOR, FDOOR]
         room_val = 0
         placed = False
         ppos = None
-        while len(doors) != 0:
-            if len(doors) == 0:
-                # placed all the doors
-                break
+        while len(door_types) != 0:
             rand_room = random.randint(0, len(self.rooms)-1)
             room = self.rooms[rand_room]
-            if len(room["doors"]) == 1:
-                dtype = doors.pop()
+            doors = self.find_doors(room)
+            if len(doors) == 1:
+                dtype = door_types.pop()
                 etype = DEM[dtype]
-                door = room["doors"][0]
+                door = doors[0]
                 if self.layout[door[0]][door[1]] == 0:
                     print(f"placing {etype} at {door}")
                     center = self.get_room_center(room)

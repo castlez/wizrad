@@ -75,8 +75,8 @@ SPRINT_SPEED = 100
 ###### Interactables ######
 
 CHEST = "C"
-CHMIN = 20
-CHMAX = 30
+CHMIN = 5
+CHMAX = 10
 
 ###### Items ######
 

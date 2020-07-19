@@ -840,6 +840,13 @@ class RoomAddition:
 		roomX = int((mapWidth/2 - roomWidth/2))-1
 		roomY = int((mapHeight/2 - roomHeight/2))-1
 		self.addRoom(roomX,roomY,room)
+
+		tl = [roomX, roomY]
+		tr = [roomX + len(room) - 1, roomY]
+		bl = [roomX, roomY + len(room[0]) - 1]
+		br = [roomX + len(room) - 1, roomY + len(room[0]) - 1]
+		self.room_data.append({"corners": [tl, tr, bl, br], "doors": []})
+
 		
 		# generate other rooms
 		# and track room centers
@@ -851,6 +858,7 @@ class RoomAddition:
 				self.addRoom(roomX,roomY,room)
 				# Get the corners (tl = top left, br = bottom right, etc)
 				# order is [tl, tr, bl, br] (like a Z)
+				self.save_map_to_file(mark=[roomX, roomY])
 				tl = [roomX, roomY]
 				tr = [roomX + len(room)-1, roomY]
 				bl = [roomX, roomY + len(room[0])-1]
@@ -861,7 +869,7 @@ class RoomAddition:
 				ny = wallTile[1] + direction[1] * tunnelLength
 
 				self.room_data.append({"corners": [tl, tr, bl, br], "doors": [door], "nine": [nx, ny]})
-				self.addTunnel(wallTile,direction,tunnelLength)
+				self.addTunnel([roomX, roomY],wallTile,direction,tunnelLength)
 				if len(self.rooms) >= self.MAX_NUM_ROOMS:
 					break
 
@@ -1109,45 +1117,55 @@ class RoomAddition:
 
 		self.rooms.append(room)
 
-	def addTunnel(self,wallTile,direction,tunnelLength):
+	def addTunnel(self,start_index,wallTile,direction,tunnelLength):
 		# carve a tunnel from a point in the room back to 
 		# the wall tile that was used in its original placement
 		
 		startX = wallTile[0] + direction[0]*tunnelLength
 		startY = wallTile[1] + direction[1]*tunnelLength
-		#self.level[startX][startY] = 1
 
-		# get our room index to compare
-		ix = wallTile[0] - direction[0]
-		iy = wallTile[1] - direction[1]
-		room_index = self.get_room_index(ix, iy)
+		ox = wallTile[0] - direction[0]
+		oy = wallTile[1] - direction[1]
+		self.save_map_to_file(mark=[ox, oy])
+
+		other_room_index = self.get_room_index(startX, startY)
+		#self.level[startX][startY] = 1
+		if other_room_index is None:
+			print("yikes")
+
+		self.save_map_to_file(mark=[startX, startY])
 
 		for i in range(self.maxTunnelLength):
 			x = startX - direction[0]*i
 			y = startY - direction[1]*i
 			self.level[x][y] = 0
-			# If you want doors, this is where the code should go
-			if ((x+direction[0]) == wallTile[0] and 
+			# If you want doors, this is where the code should go LOOOOOOOL
+			self.save_map_to_file(mark=[x, y])
+
+			if ((x+direction[0]) == wallTile[0] and
 				(y+direction[1]) == wallTile[1]):
+				doorx = x+direction[0]
+				doory = y+direction[1]
+				if [doorx, doory] not in self.room_data[other_room_index]["doors"]:
+					self.room_data[other_room_index]["doors"].append([doorx, doory])
 				break
 
-		# fill in doorways we just created by tracing from wallTile
-		# to startX, startY and discovering when we enter a new room
-		dx = wallTile[0]
-		dy = wallTile[1]
-		for i in range(self.maxTunnelLength):
-			ndx = wallTile[0] + direction[0]*i
-			ndy = wallTile[1] + direction[1]*i
-			new_index = self.get_room_index(ndx, ndy)
-			if new_index and new_index != room_index and [dx, dy] not in \
-				self.room_data[new_index]["doors"] and \
-				self.level[dx][dy] != 1:
+	def save_map_to_file(self, mark=None):
+		cur_map = ""
+		for y in range(len(self.level[0])-1):
+			for x in range(len(self.level) - 1):
+				if not mark:
+					cur_map += "." if self.level[x][y] == 0 else str(self.level[x][y])
+				else:
+					if mark[0] == x and  mark[1] == y:
+						cur_map += "#"
+					else:
+						cur_map += "." if self.level[x][y] == 0 else str(self.level[x][y])
 
-				self.room_data[new_index]["doors"].append([dx, dy])
-				break
-			else:
-				dx = ndx
-				dy = ndy
+			cur_map += "\n"
+
+		with open("wtf.txt", 'w') as f:
+			f.write(cur_map)
 
 	def get_room_index(self, x, y):
 		"""
