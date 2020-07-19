@@ -1139,13 +1139,12 @@ class RoomAddition:
 			ndx = wallTile[0] + direction[0]*i
 			ndy = wallTile[1] + direction[1]*i
 			new_index = self.get_room_index(ndx, ndy)
-			if new_index:
-				if new_index != room_index and [dx, dy] not in \
-					self.room_data[new_index]["doors"] and \
-					self.level[dx][dy] != 1:
+			if new_index and new_index != room_index and [dx, dy] not in \
+				self.room_data[new_index]["doors"] and \
+				self.level[dx][dy] != 1:
 
-					self.room_data[new_index]["doors"].append([dx, dy])
-					break
+				self.room_data[new_index]["doors"].append([dx, dy])
+				break
 			else:
 				dx = ndx
 				dy = ndy

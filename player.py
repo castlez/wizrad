@@ -64,8 +64,13 @@ class Player(pg.sprite.Sprite):
         return "I am badass, swagass, Wizrad"
 
     def move(self, dx=0, dy=0):
+        # check if blocked
         blocked = self.check_collision(dx, dy)
-        if not blocked:
+
+        # check if out of bounds
+        outbounds = self.check_out_of_bounds(dx, dy)
+
+        if not blocked and not outbounds:
             self.dx = dx
             self.dy = dy
             self.gx += dx
@@ -85,14 +90,24 @@ class Player(pg.sprite.Sprite):
     
     def is_moving(self):
         return self.dx != 0 and self.dy != 0
+
+    def check_out_of_bounds(self, dx, dy):
+        # check out of bounds to avoid screen wrap
+        newx = self.gx + dx
+        newy = self.gy + dy
+        if newx < 0 or newx > MAP_WIDTH - 1 or \
+                newy < 0 or newy > MAP_HEIGHT - 1:
+            return True
     
     def check_collision(self, dx, dy):
         new_x = self.x + dx
         new_y = self.y + dy
         blocked = False
+        # check if we bump into something
         for sprite in self.game.all_sprites:
             if new_x == sprite.x and new_y == sprite.y and sprite.blocking:
                 blocked = True
+
         # blocked if we hit something and collisions are on
         is_blocked = blocked and not self.game.godmode
         return is_blocked
