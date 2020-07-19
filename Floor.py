@@ -42,7 +42,7 @@ class Floor:
 
         # layout
         generator = RoomAddition()
-        self.layout, self.room_centers = generator.generateLevel(MAP_WIDTH, MAP_HEIGHT)
+        self.layout, self.rooms = generator.generateLevel(MAP_WIDTH, MAP_HEIGHT)
 
         # loot
         self.loot_table = None
@@ -198,113 +198,63 @@ class Floor:
                 else:
                     pass
         
-    def find_doorways(self, start_pos):
-        """
-        Returns the coordinates of all doors in a given room
-        """
-        fl = self.layout
+    def get_room_center(self, room):
+        corners = room["corners"]
+        tl = corners[0]
+        tr = corners[1]
+        bl = corners[2]
+        br = corners[3]
 
+        len_x = tr[0] - tl[0]
+        len_y = bl[1] - tl[1]
 
-        # bounds for traversal (perimeter of room)
-        xmin = None
-        xmax = None
-        ymin = None
-        ymax = None
-        
-        # track the bounds we've found around
-        found_bounds = [0,0,0,0]
-        doorways = []
-        
-        # Find the bounds of the room (up: ymin, down: ymax, left: xmin, right:xmax)
-        for direction in [[1,0], [-1,0], [0,1], [0,-1]]:
-            # reset starting position for each direction
-            coordx = start_pos[0]
-            coordy = start_pos[1]
-            found = False
-            while not found:
-                new_coords = add_tuples([coordx, coordy], direction)
-                if fl[new_coords[0]][new_coords[1]] == WALL:
-                    if direction == [1, 0] and not xmax:
-                        xmax = coordx
-                        break
-                    if direction == [-1, 0] and not xmin:
-                        xmin = coordx
-                        break
-                    if direction == [0, 1] and not ymax:
-                        ymax = coordy
-                        break
-                    if direction == [0, -1] and not ymin:
-                        ymin = coordy
-                        break
-                else:
-                    coordx = new_coords[0]
-                    coordy = new_coords[1]
-        
-        if xmax and xmin and ymax and ymin:
-                pass
-        else:
-            print(f"FAILED to find bounds of room at {start_pos}")
-            return []
-        
-        if fl[xmin-1][ymin] == 1 and fl[xmin-1][ymin-1] == 1 and fl[xmin][ymin-1] == 1:
-            print(f"({xmin}, {ymin}) is a corner!")
-        
-        # now that we have the bounds, use them to search for doorways
-        
-        # first fix y and traverse x
-        bh = "$"  # set to empty string to remove bounding
-        bv = "$"  # set to empty string to remove bounding
-        for x in range(xmin, xmax+1):
-            if bh:
-                self.layout[x][ymin] = bh
-                self.layout[x][ymax] = bh
-            if fl[x][ymin-1] == 0:
-                doorways.append([x, ymin-1])
-            elif fl[x][ymax+1] == 0:
-                doorways.append([x, ymax+1])
-            
-        # next fix x and and traverse y
-        for y in range(ymin, ymax+1):
-            if bv:
-                self.layout[xmin][y] = bv
-                self.layout[xmax][y] = bv
-            if fl[xmin-1][y] == 0:
-                doorways.append([xmin-1, y])
-            elif fl[xmax+1][y] == 0:
-                doorways.append([xmax+1, y])
+        mid_x = tr[0] - int(len_x/2)
+        mid_y = bl[1] - int(len_y/2)
 
-        # lastly get the center of the room
-        xc = xmin
-        yc = ymin
-        center_x = xc
-        center_y = yc
+        return [mid_x, mid_y]
 
-        return doorways, [center_x, center_y]
+    def get_room(self, x, y):
+        for r in self.rooms:
+            tl = r["corners"][0]
+            tr = r["corners"][1]
+            bl = r["corners"][2]
+            br = r["corners"][3]
+            if x >= tl[0] and x <= tr[0]:
+                if y >= tl[1] and y <= bl[1]:
+                    return r
 
+        return None
     def populate_floor(self):
         """
         Populates the map with stuff
         """
         #### Doors
-        doors = [FDOOR, IDOOR, ADOOR, EDOOR]
-        playerx = None
-        playery = None
-        for rxy in self.room_centers:
+        doors = [FDOOR, IDOOR, ADOOR, EDOOR, FDOOR]
+        room_val = 0
+        placed = False
+        ppos = None
+        while len(doors) != 0:
             if len(doors) == 0:
                 # placed all the doors
                 break
-            doorways, center = self.find_doorways(rxy)
-            if doorways:
-                if len(doorways) == 1:
-                    dc = doorways[0]  
-                    dtype = doors.pop()
-                    etype = DEM[dtype]
-                    print(f"placing {etype} at {rxy}")
-                    ex = rxy[0]
-                    ey = rxy[1]
+            rand_room = random.randint(0, len(self.rooms)-1)
+            room = self.rooms[rand_room]
+            if len(room["doors"]) == 1:
+                dtype = doors.pop()
+                etype = DEM[dtype]
+                door = room["doors"][0]
+                if self.layout[door[0]][door[1]] == 0:
+                    print(f"placing {etype} at {door}")
+                    center = self.get_room_center(room)
+                    ex = center[0]
+                    ey = center[1]
                     if etype == FIRE:
-                        self.layout[center[0]][center[1]] = FIRE
-                        self.layout[center[0]-1][center[1]] = PLAYER
+                        if not ppos:
+                            self.layout[ex][ey] = FIRE
+                            self.layout[ex-1][ey] = PLAYER
+                            ppos = [ex-1, ey]
+                        else:
+                            self.layout[ex][ey] = ICE
                     if etype == ICE:
                         self.layout[ex][ey] = ACID
                     if etype == ACID:
@@ -312,12 +262,10 @@ class Floor:
                     if etype == ELEC:
                         self.layout[ex][ey] = CRYSTAL
 
-                    self.layout[dc[0]][dc[1]] = dtype
-                    print(f"door at {dc}")
-                elif len(doorways) == 0:
-                    break
-                else:
-                    continue
+                    self.layout[door[0]][door[1]] = dtype
+                    print(f"door at {door}")
+
+        print(f"player at : {ppos}")
         print("done with doors and elements")
         fl = self.layout
         with open(os.getcwd() + "\\scraps\\debug.txt", 'w') as f:

@@ -828,6 +828,7 @@ class RoomAddition:
 
 	def generateLevel(self,mapWidth,mapHeight):
 		self.rooms = []
+		self.room_data = []
 
 		self.level = [[1
 			for y in range(mapHeight)]
@@ -842,14 +843,24 @@ class RoomAddition:
 		
 		# generate other rooms
 		# and track room centers
-		room_centers = []
 		for i in range(self.buildRoomAttempts):
 			room = self.generateRoom()
 			# try to position the room, get roomX and roomY
 			roomX,roomY,wallTile,direction, tunnelLength = self.placeRoom(room,mapWidth,mapHeight)
 			if roomX and roomY:
 				self.addRoom(roomX,roomY,room)
-				room_centers.append([roomX, roomY])
+				# Get the corners (tl = top left, br = bottom right, etc)
+				# order is [tl, tr, bl, br] (like a Z)
+				tl = [roomX, roomY]
+				tr = [roomX + len(room)-1, roomY]
+				bl = [roomX, roomY + len(room[0])-1]
+				br = [roomX + len(room)-1, roomY + len(room[0])-1]
+				door = [wallTile[0], wallTile[1]]
+
+				nx = wallTile[0] + direction[0] * tunnelLength
+				ny = wallTile[1] + direction[1] * tunnelLength
+
+				self.room_data.append({"corners": [tl, tr, bl, br], "doors": [door], "nine": [nx, ny]})
 				self.addTunnel(wallTile,direction,tunnelLength)
 				if len(self.rooms) >= self.MAX_NUM_ROOMS:
 					break
@@ -861,7 +872,7 @@ class RoomAddition:
 			return self.level
 		else:
 			print("running as api")
-			return self.level, room_centers
+			return self.level, self.room_data
 
 	def generateRoom(self):
 		# MODIFIED this to just be square rooms
@@ -1105,7 +1116,12 @@ class RoomAddition:
 		startX = wallTile[0] + direction[0]*tunnelLength
 		startY = wallTile[1] + direction[1]*tunnelLength
 		#self.level[startX][startY] = 1
-		
+
+		# get our room index to compare
+		ix = wallTile[0] - direction[0]
+		iy = wallTile[1] - direction[1]
+		room_index = self.get_room_index(ix, iy)
+
 		for i in range(self.maxTunnelLength):
 			x = startX - direction[0]*i
 			y = startY - direction[1]*i
@@ -1114,7 +1130,43 @@ class RoomAddition:
 			if ((x+direction[0]) == wallTile[0] and 
 				(y+direction[1]) == wallTile[1]):
 				break
-		
+
+		# fill in doorways we just created by tracing from wallTile
+		# to startX, startY and discovering when we enter a new room
+		dx = wallTile[0]
+		dy = wallTile[1]
+		for i in range(self.maxTunnelLength):
+			ndx = wallTile[0] + direction[0]*i
+			ndy = wallTile[1] + direction[1]*i
+			new_index = self.get_room_index(ndx, ndy)
+			if new_index:
+				if new_index != room_index and [dx, dy] not in \
+					self.room_data[new_index]["doors"] and \
+					self.level[dx][dy] != 1:
+
+					self.room_data[new_index]["doors"].append([dx, dy])
+					break
+			else:
+				dx = ndx
+				dy = ndy
+
+	def get_room_index(self, x, y):
+		"""
+		return the rooms index for self.room_data for a give x,y
+		:return: index of current room in self.room_data
+		"""
+		for i in range(len(self.room_data)):
+			r = self.room_data[i]
+			tl = r["corners"][0]
+			tr = r["corners"][1]
+			bl = r["corners"][2]
+			br = r["corners"][3]
+			if x >= tl[0] and x <= tr[0]:
+				if y >= tl[1] and y <= bl[1]:
+					return i
+
+		return None
+
 	def getRoomDimensions(self,room):
 		if room:
 			roomWidth = len(room)

@@ -218,6 +218,15 @@ class Game:
                         print(f"doors:")
                         for d in self.doors:
                             print(f"{d.element}: {[d.gx, d.gy]}")
+                        print(f"room:")
+                        room = self.current_floor.get_room(self.player.gx, self.player.gy)
+                        if room:
+                            print(f"corners = [tl, tr, bl, br]")
+                            print(f"{room['corners'][0]} {room['corners'][1]}")
+                            print(f"{room['corners'][2]} {room['corners'][3]}")
+                            print(f"doors = {room['doors']}")
+                        else:
+                            print("not currently in a room")
                         print("---------------")
                     if LOG_SCROLL_DOWN(event):
                         self.log.update_place(change=1)

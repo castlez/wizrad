@@ -25,7 +25,6 @@ class Player(pg.sprite.Sprite):
         # position on the screen with current change
         self.x = x
         self.y = y
-        print(f"player xy: {x},{y}")
         self.dx = 0
         self.dy = 0
         
@@ -63,10 +62,6 @@ class Player(pg.sprite.Sprite):
     
     def inspect(self):
         return "I am badass, swagass, Wizrad"
-
-    def update_global_position(self, x, y):
-        self.gx = x
-        self.gy = y
 
     def move(self, dx=0, dy=0):
         blocked = self.check_collision(dx, dy)
