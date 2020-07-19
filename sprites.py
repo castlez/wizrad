@@ -188,6 +188,8 @@ class Door(WSPRITE):
             self.set_sign(self.element + DEAD)
             # TODO: make this personalized for each element
             return "The magic leaps from my hands, unlocking the door!"
+        else:
+            return "Hmmm, touching the door did nothing. Perhaps I need another element?"
     
     def take_damage(self, amount):
         self.game.log.info("The spell fizzles on the door."\
@@ -212,8 +214,11 @@ class BurningPile(WSPRITE):
             fire_ball = KnownSpell(name="Fire Ball", 
                                    elements=[FIRE],
                                    description="Shoots a fireball at the cursor")
-            player.add_spell(fire_ball)
-            return "I studied the pile and learned the secrets of fire magic!"
+            result = player.add_spell(fire_ball)
+            if result:
+                return "I studied the pile and learned the secrets of fire magic!"
+            else:
+                return "...thus I will have to wait to wield this power..."
 
 class IceBlock(WSPRITE):
     """
@@ -233,9 +238,11 @@ class IceBlock(WSPRITE):
             icecycle = KnownSpell(name="Icicle",
                                    elements=[ICE],
                                    description="Shoots an icicle at the cursor")
-            player.add_spell(icecycle)
-            return "I studied the block and learned the secrets of ice magic!"
-
+            result = player.add_spell(icecycle)
+            if result:
+                return "I studied the block and learned the secrets of ice magic!"
+            else:
+                return "...thus I will have to wait to wield this power..."
 
 class AcidPuddle(WSPRITE):
     """
@@ -256,8 +263,11 @@ class AcidPuddle(WSPRITE):
             acid_splash = KnownSpell(name="Acid Splash",
                                    elements=[ACID],
                                    description="Shoots an acid at the cursor")
-            player.add_spell(acid_splash)
-            return "I studied the puddle and learned the secrets of acid magic!"
+            result = player.add_spell(acid_splash)
+            if result:
+                return "I studied the puddle and learned the secrets of acid magic!"
+            else:
+                return "...thus I will have to wait to wield this power..."
 
 class ArcingArtifact(WSPRITE):
     """
@@ -278,8 +288,11 @@ class ArcingArtifact(WSPRITE):
             sparks = KnownSpell(name="sparks",
                                    elements=[ELEC],
                                    description="Shoots electric sparks at the cursor")
-            player.add_spell(sparks)
-            return "I studied the puddle and learned the secrets of acid magic!"
+            result = player.add_spell(sparks)
+            if result:
+                return "I studied the artifact and learned the secrets of electric magic!"
+            else:
+                return "...thus I will have to wait to wield this power..."
 
 
 class Chest(WSPRITE):
@@ -307,6 +320,42 @@ class Chest(WSPRITE):
         else:
             return "The chest is to far away for me to open..."
 
+class OmniGem(WSPRITE):
+    def __init__(self, game, x, y, gx, gy):
+        super().__init__(game, x, y, gx, gy, game.walls, color=LIGHTGREY)
+        self.inspect_message = "The all mighty Omni Gem! I must harness all the elements to unlock its power!"
+        self.blocking = True
+        self.name = "OmniGem"
+        self.colors = [FCOLOR, ICOLOR, ACOLOR, ECOLOR]
+        self.set_sign(CRYSTAL + SPAWNED)
+
+    def take_damage(self, amount):
+        self.game.log.info("My spells clash against the OmniGem with no affect... Perhaps if I touched it...")
+
+    def interact(self, player):
+        """
+        The win condition of the game
+        """
+        if player.has_element(FIRE) and player.has_element(ICE) and \
+                player.has_element(ACID) and player.has_element(ELEC):
+            self.game.win = True
+            return "After all I've been through, the OmniGem is finally mine!"
+        else:
+            return "Touching the OmniGem did nothing. Maybe I need more elements?"
+
+    def drawt(self, screen):
+        if self.visible:
+            cur_size = TEXT_SIZE
+            x = self.rect.x
+            y = self.rect.y
+            for c in self.colors:
+                image = pg.Surface((cur_size, cur_size))
+                image.fill(c)
+                #rect = image.get_rect()
+                screen.blit(image, (x, y))
+                cur_size -= int(cur_size*0.25)
+                y += int(TILESIZE*0.25)
+                x += int(TILESIZE*0.25)
 
 # Enemies
 class Skeleton(WSPRITE):

@@ -37,6 +37,8 @@ class Game:
         self.show_inventory = False
         self.godmode = GODMODE
 
+        self.win = False  # the game has been won
+
         pg.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
     def load_data(self):
@@ -215,6 +217,7 @@ class Game:
                         print(f"player = {[self.player.gx, self.player.gy]}")
                         print(f"walls = {len(self.walls)}")
                         print(f"enemies = {len(self.enemies)}")
+                        print(f"WON?: {self.win}")
                         print(f"doors:")
                         for d in self.doors:
                             print(f"{d.element}: {[d.gx, d.gy]}")
@@ -224,7 +227,6 @@ class Game:
                             print(f"corners = [tl, tr, bl, br]")
                             print(f"{room['corners'][0]} {room['corners'][1]}")
                             print(f"{room['corners'][2]} {room['corners'][3]}")
-                            print(f"doors = {room['doors']}")
                         else:
                             print("not currently in a room")
                         print("---------------")

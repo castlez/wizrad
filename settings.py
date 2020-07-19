@@ -1,3 +1,5 @@
+DEBUG=True
+
 # strings
 INTRO = ["i:Welcome to Wizrad! Find all the elements and break "\
          "the Omni Gem for ultimate POWER",

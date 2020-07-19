@@ -10,7 +10,7 @@ from settings import *
 from settings import FIRE, ACID, ICE, ELEC
 
 # add two tuples component wise (WHY DOESNT THIS ALREADY EXIST?!)
-from sprites import Wall, BurningPile, IceBlock, Skeleton, Chest, Door, AcidPuddle, ArcingArtifact
+from sprites import Wall, BurningPile, IceBlock, Skeleton, Chest, Door, AcidPuddle, ArcingArtifact, OmniGem
 
 add_tuples = lambda t1, t2: [t1[0]+t2[0], t1[1]+t2[1]]
 
@@ -195,6 +195,8 @@ class Floor:
                     self.add_inter(Chest(self.game, lx, ly, gx, gy))
                 elif value in [FDOOR, IDOOR, EDOOR, ADOOR]:
                     self.add_door(Door(DEM[value], self.game, lx, ly, gx, gy))
+                elif value == CRYSTAL:
+                    self.add_inter(OmniGem(self.game, lx, ly, gx, gy))
                 else:
                     pass
         
@@ -236,18 +238,19 @@ class Floor:
         bl = room["corners"][2]
         br = room["corners"][3]
         doors = []
+        # can get away with check if its not a wall because
+        # only walls and doors have been rendered so far
         for x in range(tl[0], tr[0]):
-            if self.layout[x][tl[1]-1] == 0:
+            if self.layout[x][tl[1]-1] != 1:
                 doors.append([x, tl[1]-1])
-            if self.layout[x][bl[1]+1] == 0:
+            if self.layout[x][bl[1]+1] != 1:
                 doors.append([x, bl[1]+1])
         for y in range(tl[1], bl[1]):
-            if self.layout[tl[0]-1][y] == 0:
+            if self.layout[tl[0]-1][y] != 1:
                 doors.append([tl[0]-1, y])
-            if self.layout[tr[0]+1][y] == 0:
+            if self.layout[tr[0]+1][y] != 1:
                 doors.append([tr[0]+1, y])
         return doors
-
 
     def populate_floor(self):
         """
@@ -287,18 +290,18 @@ class Floor:
 
                     self.layout[door[0]][door[1]] = dtype
                     print(f"door at {door}")
-
-        print(f"player at : {ppos}")
-        print("done with doors and elements")
-        fl = self.layout
-        with open(os.getcwd() + "\\scraps\\debug.txt", 'w') as f:
-            mp = ""
-            for y in range(MAP_HEIGHT):
-                for x in range(MAP_WIDTH):
-                    w = "." if fl[x][y] == 0 else fl[x][y]
-                    mp += f"{w}"
-                mp += "\n"
-            f.write(mp)
+        if DEBUG:
+            print(f"player at : {ppos}")
+            print("done with doors and elements")
+            fl = self.layout
+            with open(os.getcwd() + "\\scraps\\debug.txt", 'w') as f:
+                mp = ""
+                for y in range(MAP_HEIGHT):
+                    for x in range(MAP_WIDTH):
+                        w = "." if fl[x][y] == 0 else fl[x][y]
+                        mp += f"{w}"
+                    mp += "\n"
+                f.write(mp)
 
         # skeletons
         num_skele = random.randint(SKMIN, SKMAX)
