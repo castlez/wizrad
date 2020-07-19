@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7457b053-77ab-475a-9836-b4b534730d96" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Floor.py" beforeDir="false" afterPath="$PROJECT_DIR$/Floor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dg/dungeonGenerationAlgorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/dg/dungeonGenerationAlgorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,11 +12,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dg/dungeonGenerationAlgorithms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="193">
-              <caret line="1130" column="61" selection-start-line="1130" selection-start-column="61" selection-end-line="1130" selection-end-column="61" />
+            <state relative-caret-position="176">
+              <caret line="847" column="58" selection-start-line="847" selection-start-column="58" selection-end-line="847" selection-end-column="58" />
               <folding>
                 <element signature="e#0#658#1" />
                 <element signature="e#789#919#0" />
@@ -396,8 +394,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/wtf.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="53" column="70" lean-forward="true" selection-start-line="53" selection-start-column="70" selection-end-line="53" selection-end-column="70" />
+            <state relative-caret-position="-221">
+              <caret line="2" column="70" lean-forward="true" selection-start-line="2" selection-start-column="70" selection-end-line="2" selection-end-column="70" />
             </state>
           </provider>
         </entry>
@@ -504,7 +502,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Floor.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="217">
@@ -594,8 +592,8 @@
         <option value="$PROJECT_DIR$/player.py" />
         <option value="$PROJECT_DIR$/settings.py" />
         <option value="$PROJECT_DIR$/scraps/debug.txt" />
-        <option value="$PROJECT_DIR$/dg/dungeonGenerationAlgorithms.py" />
         <option value="$PROJECT_DIR$/Floor.py" />
+        <option value="$PROJECT_DIR$/dg/dungeonGenerationAlgorithms.py" />
       </list>
     </option>
   </component>
@@ -707,13 +705,13 @@
       <window_info id="Favorites" order="0" side_tool="true" />
       <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.24941176" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="0" weight="0.25879398" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="0" visible="true" weight="0.38567838" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="2" weight="0.32914573" />
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" />
       <window_info anchor="bottom" id="Version Control" order="5" />
-      <window_info active="true" anchor="bottom" id="Run" order="6" visible="true" weight="0.37688443" />
+      <window_info anchor="bottom" id="Run" order="6" weight="0.37688443" />
       <window_info anchor="bottom" id="Debug" order="7" weight="0.40201005" />
       <window_info anchor="bottom" id="Cvs" order="8" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="9" weight="0.4" />
@@ -724,15 +722,6 @@
     </layout>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dg/dungeonGenerationAlgorithms.py</url>
-          <line>1133</line>
-          <option name="timeStamp" value="48" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="self.room_data[new_index][&quot;doors&quot;]" language="Python" />
@@ -1065,15 +1054,54 @@ f + 1</expression-string>
     </entry>
     <entry file="file://$PROJECT_DIR$/wtf.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="53" column="70" lean-forward="true" selection-start-line="53" selection-start-column="70" selection-end-line="53" selection-end-column="70" />
+        <state relative-caret-position="-221">
+          <caret line="2" column="70" lean-forward="true" selection-start-line="2" selection-start-column="70" selection-end-line="2" selection-end-column="70" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Floor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="217">
+          <caret line="261" selection-start-line="261" selection-end-line="261" />
+          <folding>
+            <element signature="e#0#19#1" />
+            <element signature="e#20#29#0" expanded="true" />
+            <element signature="e#401#547#1" />
+            <element signature="e#1273#1412#0" />
+            <element signature="e#1273#1331#1" />
+            <element signature="e#1446#1645#0" />
+            <element signature="e#1446#1508#1" />
+            <element signature="e#1688#1861#0" />
+            <element signature="e#1712#1861#0" />
+            <element signature="e#1901#2004#0" />
+            <element signature="e#2057#2127#0" />
+            <element signature="e#2183#2281#0" />
+            <element signature="e#2327#2384#0" />
+            <element signature="e#2428#2481#0" />
+            <element signature="e#2528#2601#0" />
+            <element signature="e#2650#2728#0" />
+            <element signature="e#2775#3087#0" />
+            <element signature="e#3129#3790#0" />
+            <element signature="e#3322#3790#0" />
+            <element signature="e#3486#3553#0" />
+            <element signature="e#3601#3790#0" />
+            <element signature="e#3723#3790#0" />
+            <element signature="e#3831#4144#0" />
+            <element signature="e#3831#3921#1" />
+            <element signature="e#4407#4451#0" />
+            <element signature="e#4601#4653#0" />
+            <element signature="e#5029#6081#0" />
+            <element signature="e#5095#6081#0" />
+            <element signature="e#5326#5431#0" />
+            <element signature="e#5710#5789#0" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dg/dungeonGenerationAlgorithms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="1130" column="61" selection-start-line="1130" selection-start-column="61" selection-end-line="1130" selection-end-column="61" />
+        <state relative-caret-position="176">
+          <caret line="847" column="58" selection-start-line="847" selection-start-column="58" selection-end-line="847" selection-end-column="58" />
           <folding>
             <element signature="e#0#658#1" />
             <element signature="e#789#919#0" />
@@ -1443,45 +1471,6 @@ f + 1</expression-string>
             <element signature="e#55264#55307#0" />
             <element signature="e#55466#55470#0" />
             <element signature="e#55500#55535#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Floor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="261" selection-start-line="261" selection-end-line="261" />
-          <folding>
-            <element signature="e#0#19#1" />
-            <element signature="e#20#29#0" expanded="true" />
-            <element signature="e#401#547#1" />
-            <element signature="e#1273#1412#0" />
-            <element signature="e#1273#1331#1" />
-            <element signature="e#1446#1645#0" />
-            <element signature="e#1446#1508#1" />
-            <element signature="e#1688#1861#0" />
-            <element signature="e#1712#1861#0" />
-            <element signature="e#1901#2004#0" />
-            <element signature="e#2057#2127#0" />
-            <element signature="e#2183#2281#0" />
-            <element signature="e#2327#2384#0" />
-            <element signature="e#2428#2481#0" />
-            <element signature="e#2528#2601#0" />
-            <element signature="e#2650#2728#0" />
-            <element signature="e#2775#3087#0" />
-            <element signature="e#3129#3790#0" />
-            <element signature="e#3322#3790#0" />
-            <element signature="e#3486#3553#0" />
-            <element signature="e#3601#3790#0" />
-            <element signature="e#3723#3790#0" />
-            <element signature="e#3831#4144#0" />
-            <element signature="e#3831#3921#1" />
-            <element signature="e#4407#4451#0" />
-            <element signature="e#4601#4653#0" />
-            <element signature="e#5029#6081#0" />
-            <element signature="e#5095#6081#0" />
-            <element signature="e#5326#5431#0" />
-            <element signature="e#5710#5789#0" />
           </folding>
         </state>
       </provider>

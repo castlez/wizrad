@@ -845,7 +845,7 @@ class RoomAddition:
 		tr = [roomX + len(room) - 1, roomY]
 		bl = [roomX, roomY + len(room[0]) - 1]
 		br = [roomX + len(room) - 1, roomY + len(room[0]) - 1]
-		self.room_data.append({"corners": [tl, tr, bl, br], "doors": []})
+		self.room_data.append({"corners": [tl, tr, bl, br]})
 
 		
 		# generate other rooms
@@ -863,12 +863,7 @@ class RoomAddition:
 				tr = [roomX + len(room)-1, roomY]
 				bl = [roomX, roomY + len(room[0])-1]
 				br = [roomX + len(room)-1, roomY + len(room[0])-1]
-				door = [wallTile[0], wallTile[1]]
-
-				nx = wallTile[0] + direction[0] * tunnelLength
-				ny = wallTile[1] + direction[1] * tunnelLength
-
-				self.room_data.append({"corners": [tl, tr, bl, br], "doors": [door], "nine": [nx, ny]})
+				self.room_data.append({"corners": [tl, tr, bl, br]})
 				self.addTunnel([roomX, roomY],wallTile,direction,tunnelLength)
 				if len(self.rooms) >= self.MAX_NUM_ROOMS:
 					break
@@ -1124,30 +1119,17 @@ class RoomAddition:
 		startX = wallTile[0] + direction[0]*tunnelLength
 		startY = wallTile[1] + direction[1]*tunnelLength
 
-		ox = wallTile[0] - direction[0]
-		oy = wallTile[1] - direction[1]
-		self.save_map_to_file(mark=[ox, oy])
-
-		other_room_index = self.get_room_index(startX, startY)
-		#self.level[startX][startY] = 1
-		if other_room_index is None:
-			print("yikes")
-
-		self.save_map_to_file(mark=[startX, startY])
+		# self.save_map_to_file(mark=[startX, startY])
 
 		for i in range(self.maxTunnelLength):
 			x = startX - direction[0]*i
 			y = startY - direction[1]*i
 			self.level[x][y] = 0
 			# If you want doors, this is where the code should go LOOOOOOOL
-			self.save_map_to_file(mark=[x, y])
+			# self.save_map_to_file(mark=[x, y])
 
 			if ((x+direction[0]) == wallTile[0] and
 				(y+direction[1]) == wallTile[1]):
-				doorx = x+direction[0]
-				doory = y+direction[1]
-				if [doorx, doory] not in self.room_data[other_room_index]["doors"]:
-					self.room_data[other_room_index]["doors"].append([doorx, doory])
 				break
 
 	def save_map_to_file(self, mark=None):
