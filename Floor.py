@@ -65,6 +65,10 @@ class Floor:
         return item
     
     def get_valid_pos(self):
+        """
+        Get a random position that is currently ground
+        :return:
+        """
         while True:
             x = random.randint(1, MAP_WIDTH-1)
             y = random.randint(1, MAP_HEIGHT-1)
@@ -104,6 +108,13 @@ class Floor:
         self.all.remove(enemy)
 
     def get_local_pos(self, gx, gy):
+        """
+        take a global coord and convert it into
+        a local position on the screen
+        :param gx:
+        :param gy:
+        :return:
+        """
         xmin = self.current_view[0][0]
         xmax = self.current_view[0][1]
         ymin = self.current_view[1][0]
@@ -117,6 +128,10 @@ class Floor:
         return lx, ly
     
     def purge_unseen(self):
+        """
+        Remove dead enemies and opened doors
+        :return:
+        """
         xmin = self.current_view[0][0]
         xmax = self.current_view[0][1]
         ymin = self.current_view[1][0]
@@ -148,6 +163,13 @@ class Floor:
             sprite.visible = True
 
     def update_viewport(self, gx, gy):
+        """
+        Draw a box around the player (figuratively) and
+        updates the visibility and spawning of stuff
+        :param gx:
+        :param gy:
+        :return:
+        """
         # need to massage the indexes so that (xmin, ymin) is (0, 0) on the view
         xmin = gx - PLAYER_X
         xmax = gx + PLAYER_X + 2
@@ -201,11 +223,16 @@ class Floor:
                     pass
         
     def get_room_center(self, room):
+        """
+        Gets the point closest to the center of the room
+        Only need three corners
+        :param room:
+        :return:
+        """
         corners = room["corners"]
         tl = corners[0]
         tr = corners[1]
         bl = corners[2]
-        br = corners[3]
 
         len_x = tr[0] - tl[0]
         len_y = bl[1] - tl[1]

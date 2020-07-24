@@ -8,6 +8,8 @@ import pygame as pg
 from pygame.locals import *
 import sys
 import math
+
+from StartScreen import StartScreen
 from settings import *
 from sprites import *
 from Floor import *
@@ -35,7 +37,9 @@ class Game:
         self.log = None
         self.tick = False
         self.show_inventory = False
+        self.show_startscreen = True  # start with start screen
         self.godmode = GODMODE
+        self.playing = False
 
         self.win = False  # the game has been won
 
@@ -55,6 +59,7 @@ class Game:
         self.screens = pg.sprite.Group()
         self.log = LogWindow(self, 3, 15)
         self.inventory = Inventory(self, 0, 0)
+        self.start_screen = StartScreen(self)
 
         # first floor (TODO start screen)
         self.current_floor = Floor(self, 1)
@@ -116,28 +121,29 @@ class Game:
         if not self.player.still:
             self.tick = True
 
-        if self.show_inventory:
-            self.inventory.update()
-        elif self.tick:  # NOTE: might be able to toggle turn based here... 
-            # use the global position of the player to decide what to draw
-            cur_g_x = self.player.gx
-            cur_g_y = self.player.gy
+        if not self.show_startscreen:
+            if self.show_inventory:
+                self.inventory.update()
+            elif self.tick:  # NOTE: might be able to toggle turn based here...
+                # use the global position of the player to decide what to draw
+                cur_g_x = self.player.gx
+                cur_g_y = self.player.gy
 
-            self.playerg.update()
-            self.walls.update()
-            self.spells.update()
-            self.enemies.update()
-            self.inters.update()
-            self.doors.update()
-            self.current_floor.update_viewport(cur_g_x, cur_g_y)
-            self.player.still = True
-            self.tick = False
-            self.player.dx = 0
-            self.player.dy = 0
-        self.log.update()
+                self.playerg.update()
+                self.walls.update()
+                self.spells.update()
+                self.enemies.update()
+                self.inters.update()
+                self.doors.update()
+                self.current_floor.update_viewport(cur_g_x, cur_g_y)
+                self.player.still = True
+                self.tick = False
+                self.player.dx = 0
+                self.player.dy = 0
+            self.log.update()
 
-        if not self.player.state.alive:
-            self.playing = False
+            if not self.player.state.alive:
+                self.playing = False
         
 
     def draw_grid(self):
@@ -147,24 +153,28 @@ class Game:
             pg.draw.line(self.screen, DARKGREY, (0, y), (WIDTH, y))
 
     def draw(self):
-        if self.show_inventory:
-            self.inventory.drawt(self.screen)
+
+        if self.show_startscreen:
+            self.start_screen.drawt(self.screen)
         else:
-            self.screen.fill(BGCOLOR)
-            for wall in self.walls:
-                wall.drawt(self.screen)
-            for enemy in self.enemies:
-                enemy.drawt(self.screen)
-            for inter in self.inters:
-                inter.drawt(self.screen)
-            for spell in self.spells:
-                spell.drawt(self.screen)
-            for door in self.doors:
-                door.drawt(self.screen)
-            if self.show_grid:
-                self.draw_grid()
-            self.player.drawt(self.screen)
-        self.log.draw(self.screen)
+            if self.show_inventory:
+                self.inventory.drawt(self.screen)
+            else:
+                self.screen.fill(BGCOLOR)
+                for wall in self.walls:
+                    wall.drawt(self.screen)
+                for enemy in self.enemies:
+                    enemy.drawt(self.screen)
+                for inter in self.inters:
+                    inter.drawt(self.screen)
+                for spell in self.spells:
+                    spell.drawt(self.screen)
+                for door in self.doors:
+                    door.drawt(self.screen)
+                if self.show_grid:
+                    self.draw_grid()
+                self.player.drawt(self.screen)
+            self.log.draw(self.screen)
         pg.display.flip()
 
     def events(self):
@@ -172,7 +182,9 @@ class Game:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
-            if self.show_inventory:
+            if self.show_startscreen:
+                self.start_screen.check_event(event)
+            elif self.show_inventory:
                 if event.type == pg.KEYDOWN:
                     if INVENTORY(event):
                         self.show_inventory = False
@@ -278,9 +290,6 @@ class Game:
             return False
         return True
 
-    def show_start_screen(self):
-        pass
-
     def show_go_screen(self):
         pass
 
@@ -288,7 +297,6 @@ class Game:
 while True:
     print(" ________  new game ________")
     g = Game()
-    g.show_start_screen()
     alive = True
     while alive:
         g.new()

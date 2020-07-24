@@ -67,8 +67,8 @@ PLAYER_STR_RATE = 0.5
 PLAYER_CON_RATE = 1.5
 PLAYER_INT_RATE = 0.5
 
-
-GODMODE = True
+# current god mode (also starting godmode)
+GODMODE = False
 
 # Movement
 SPRINT_DELAY = 1
