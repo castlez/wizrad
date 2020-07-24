@@ -6,7 +6,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7457b053-77ab-475a-9836-b4b534730d96" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sprites.py" beforeDir="false" afterPath="$PROJECT_DIR$/sprites.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/wtf.txt" beforeDir="false" afterPath="$PROJECT_DIR$/wtf.txt" afterDir="false" />
     </list>
@@ -88,8 +87,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/sprites.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="416" column="58" selection-start-line="416" selection-start-column="58" selection-end-line="416" selection-end-column="58" />
+            <state relative-caret-position="343">
+              <caret line="444" column="34" lean-forward="true" selection-start-line="444" selection-start-column="34" selection-end-line="444" selection-end-column="34" />
               <folding>
                 <element signature="e#145#321#1" />
                 <element signature="e#1188#1215#0" />
@@ -295,8 +294,8 @@
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" weight="0.32914573" />
       <window_info anchor="bottom" id="Version Control" order="5" />
-      <window_info anchor="bottom" id="Run" order="6" weight="0.37688443" />
-      <window_info active="true" anchor="bottom" id="Debug" order="7" visible="true" weight="0.40201005" />
+      <window_info active="true" anchor="bottom" id="Run" order="6" visible="true" weight="0.37688443" />
+      <window_info anchor="bottom" id="Debug" order="7" weight="0.40201005" />
       <window_info anchor="bottom" id="Cvs" order="8" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="9" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="10" />
@@ -743,8 +742,8 @@ f + 1</expression-string>
     </entry>
     <entry file="file://$PROJECT_DIR$/sprites.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="416" column="58" selection-start-line="416" selection-start-column="58" selection-end-line="416" selection-end-column="58" />
+        <state relative-caret-position="343">
+          <caret line="444" column="34" lean-forward="true" selection-start-line="444" selection-start-column="34" selection-end-line="444" selection-end-column="34" />
           <folding>
             <element signature="e#145#321#1" />
             <element signature="e#1188#1215#0" />

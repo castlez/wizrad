@@ -441,6 +441,7 @@ class Skeleton(WSPRITE):
                 self.game.log.info("...and it killed it!")
                 self.game.player.gain_xp(SK_XP)
                 self.set_sign(SKELETON + DEAD)
+                self.game.current_floor.remove_enemy(self)
                 self.alive = False
     
     def hit(self, target):
