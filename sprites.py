@@ -72,13 +72,15 @@ class WSPRITE(pg.sprite.Sprite):
     def set_sign(self, sign):
         self.game.current_floor.layout[self.start_pos[0]][self.start_pos[1]] = sign
     
-    def get_next_space(self):
+    def get_next_space(self, target):
         """
         TODO make this actually return a space 
         AND NOT A FUCKING DX, DY, or change the name
         """
         # Find direction vector (dx, dy) between enemy and player.
-        dx, dy = self.game.player.x - self.x, self.game.player.y - self.y
+        gx = target[0]
+        gy = target[1]
+        dx, dy = gx - self.gx, gy - self.gy
         dist = math.hypot(dx, dy)
         if dist == 0:
             # dont need to move if already munching on player
@@ -92,7 +94,7 @@ class WSPRITE(pg.sprite.Sprite):
 
         # check if already diagonal to player and just
         # need to move to hit range (adjacent NON diagonal)
-        if self.adjacent_to_player(self.x, self.y):
+        if self.adjacent_to_player(self.gx, self.gy):
             if abs(cx) == 1 and abs(cy) == 1:
                 # we are diagonal
                 t = cx + cy
@@ -102,31 +104,32 @@ class WSPRITE(pg.sprite.Sprite):
                     return cx, 0
         return cx, cy
     
-    def check_player_los(self):
-        x = self.x
-        y = self.y
-        
-        while x in range(0, GRIDWIDTH) and y in range(0, GRIDHEIGHT):
-            if self.adjacent_to_player(x, y):
-                return True
-            dx, dy = self.get_next_space()
-            x += dx
-            y += dy
-            try:
-                for sprite in self.game.all_sprites:
-                    if sprite.x == x and sprite.y == y and sprite != self:
+    def check_player_los(self, player):
+        target = [player.gx, player.gy]
+        gx = self.gx
+        gy = self.gy
+        spot = None
+        while gx in range(0, MAP_WIDTH) and gy in range(0, MAP_HEIGHT):
+            # if self.adjacent_to_player(x, y):
+            #     return True
+            dx, dy = self.get_next_space(target=target)
+            gx += dx
+            gy += dy
+            for sprite in self.game.all_sprites:
+                if sprite.name in ["Player", "Wall"]:
+                    if sprite.gx == gx and sprite.gy == gy and sprite != self:
                         if sprite.name == "Player":
-                            return True
+                            spot = [sprite.gx, sprite.gy]
                         elif sprite.name == "Wall":
-                            return False
-            except Exception as e:
-                traceback.print_exc(e)
-                continue
-        return False
+                            return None
+            if spot:
+                break
+        print(f"los at {spot}")
+        return spot
     
     def adjacent_to_player(self, newx, newy):
-        px = self.game.player.x
-        py = self.game.player.y
+        px = self.game.player.gx
+        py = self.game.player.gy
         dx = abs(px - newx)
         dy = abs(py - newy)
         adjacent = dx <= 1 and dy <= 1
@@ -372,71 +375,79 @@ class Skeleton(WSPRITE):
         self.blocking = True
         self.is_enemy = True
         self.alive = True
+        self.player_last = None
 
         # movement
         self.skip = False  # skip a tick after hitting the player
 
     def update(self):
-        if self.visible:
+        if self.visible and self.alive:
             # check if we have los on the player and move if we do
-            see_player = False
-            if self.check_player_los():
-                see_player = True
-            cx, cy = self.get_next_space()
-            newx = self.x + cx 
-            newy = self.y + cy
-            # check collisions
-            blocked = False
-            hit_sprite = None
-            if self.alive:
-                for sprite in self.game.all_sprites:
-                    try:
-                        if sprite.x == newx and sprite.y == newy and sprite != self:
-                            self.hit(sprite)
-                            if sprite.blocking:
-                                # if it collides with a sprite and it isnt itself, block
-                                blocked = True
-                    except:
-                        pass
+            moved = False
+            player_last = self.check_player_los(self.game.player)
+            if player_last:
+                if player_last != self.player_last:
+                    self.player_last = player_last
 
-                # if we are unblocked and can see the player
-                # then we check if we are already next to the player
-                # and if not, we move
-                if not blocked and see_player and not self.skip:
-                    self.gx += cx
-                    self.gy += cy
-
-                    x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
-                    self.x = x
-                    self.y = y
-
+            if self.player_last:
+                if self.player_last[0] == self.gx and self.player_last[1] == self.gy:
+                    self.player_last = None
                 else:
-                    # just adjust for viewpoint movement
-                    self.x -= self.game.player.dx
-                    self.y -= self.game.player.dy
-                    self.skip = False
-                self.rect.x = self.x * TILESIZE
-                self.rect.y = self.y * TILESIZE
+                    cx, cy = self.get_next_space(target=self.player_last)
+                    newx = self.gx + cx
+                    newy = self.gy + cy
+                    # check collisions
+                    blocked = False
+                    hit_sprite = None
+                    for sprite in self.game.all_sprites:
+                        try:
+                            if sprite.gx == newx and sprite.gy == newy and sprite != self:
+                                self.hit(sprite)
+                                if sprite.blocking:
+                                    # if it collides with a sprite and it isnt itself, block
+                                    blocked = True
+                        except:
+                            pass
+
+                    # if we are unblocked and can see the player
+                    # then we check if we are already next to the player
+                    # and if not, we move
+                    if not blocked and not self.skip:
+                        self.gx += cx - self.game.player.dx
+                        self.gy += cy -self.game.player.dy
+
+                        x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+                        self.x = x
+                        self.y = y
+                        moved = True
+            if not moved:
+                # just adjust for viewpoint movement
+                self.x -= self.game.player.dx
+                self.y -= self.game.player.dy
+                self.skip = False
+            self.rect.x = self.x * TILESIZE
+            self.rect.y = self.y * TILESIZE
 
     def draw(self, screen):
         print("drawing skele")
-        if self.visible:
+        if self.visible and self.alive:
             screen.blit(self.rect, (self.rect.x, self.rect.y))
     
     def take_damage(self, amount):
-        self.health = self.health - amount
-        self.game.log.info(f"I hit the skeleton for {amount} damage! ({self.health} hp)")
-        if self.health <= 0 and self.alive:
-            self.game.log.info("...and it killed it!")
-            self.game.player.gain_xp(SK_XP)
-            self.set_sign(SKELETON + DEAD)
-            self.alive = False
+        if self.alive:
+            self.health = self.health - amount
+            self.game.log.info(f"I hit the skeleton for {amount} damage! ({self.health} hp)")
+            if self.health <= 0:
+                self.game.log.info("...and it killed it!")
+                self.game.player.gain_xp(SK_XP)
+                self.set_sign(SKELETON + DEAD)
+                self.alive = False
     
     def hit(self, target):
         # can only hurt the player
         if target.name == "Player":
             self.skip = True
-            dmg = random.randint(SKDAMAGE_RANGE[0], SKDAMAGE_RANGE[1])
+            dmg = random.randint(SKDAMAGE_RANGE[0], SKDAMAGE_RANGE[1]+1)
             target.take_damage(self, dmg)
             
     
