@@ -165,7 +165,7 @@ class Door(WSPRITE):
         if element == FIRE:
             return "A frozen door, needs to be heated up"
         elif element == ACID:
-            return "A steel door, needs to be disolved"
+            return "A steel door, needs to be dissolved"
         elif element == ICE:
             return "A burning door, needs to cool off"
         elif element == ELEC:
