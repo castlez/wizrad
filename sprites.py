@@ -67,10 +67,10 @@ class WSPRITE(pg.sprite.Sprite):
             self.rect.y = self.y * TILESIZE
 
     def get_local_pos(self):
-        return self.game.current_floor.get_local_pos(self.gx, self.gy)
+        return self.game.floor.get_local_pos(self.gx, self.gy)
     
     def set_sign(self, sign):
-        self.game.current_floor.layout[self.start_pos[0]][self.start_pos[1]] = sign
+        self.game.floor.layout[self.start_pos[0]][self.start_pos[1]] = sign
     
     def get_next_space(self, target):
         """
@@ -116,11 +116,11 @@ class WSPRITE(pg.sprite.Sprite):
             gx += dx
             gy += dy
             for sprite in self.game.all_sprites:
-                if sprite.name in ["Player", "Wall"]:
+                if sprite.name != "LogWindow":
                     if sprite.gx == gx and sprite.gy == gy and sprite != self:
                         if sprite.name == "Player":
                             spot = [sprite.gx, sprite.gy]
-                        elif sprite.name == "Wall":
+                        elif sprite.blocking:
                             return None
             if spot:
                 break
@@ -160,8 +160,7 @@ class Door(WSPRITE):
         self.is_door = True
         self.locked = True
         self.name = "Door"
-        self.set_sign(self.element + SPAWNED)
-    
+
     def get_desc(self, element):
         if element == FIRE:
             return "A frozen door, needs to be heated up"
@@ -190,7 +189,7 @@ class Door(WSPRITE):
         if player.has_element(self.element):
             self.set_sign(self.element + DEAD)
             # TODO: make this personalized for each element
-            self.game.current_floor.remove_inter(self)
+            self.game.floor.remove_inter(self)
             return "The magic leaps from my hands, unlocking the door!"
         else:
             return "Hmmm, touching the door did nothing. Perhaps I need another element?"
@@ -308,15 +307,15 @@ class Chest(WSPRITE):
         self.inspect_message = "Its a chest. Might have some loot in it..."
         self.name = "Chest"
         self.set_sign(CHEST + SPAWNED)
-        self.contents = self.game.current_floor.get_loot()
+        self.contents = self.game.floor.get_loot()
     
     def interact(self, player):
-        if self.adjacent_to_player(self.x, self.y):
+        if self.adjacent_to_player(self.gx, self.gy):
             # if the players inven is not full, grab the item
             # and remove the chest
             got = self.game.player.get_item(self.contents)
             if got:
-                self.game.current_floor.remove_inter(self)
+                self.game.floor.remove_inter(self)
                 return f"Got a {self.contents.name}!"
             else:
                 return "I can't carry any more :("
@@ -416,7 +415,7 @@ class Skeleton(WSPRITE):
                         self.gx += cx - self.game.player.dx
                         self.gy += cy -self.game.player.dy
 
-                        x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+                        x, y = self.game.floor.get_local_pos(self.gx, self.gy)
                         self.x = x
                         self.y = y
                         moved = True
@@ -441,7 +440,7 @@ class Skeleton(WSPRITE):
                 self.game.log.info("...and it killed it!")
                 self.game.player.gain_xp(SK_XP)
                 self.set_sign(SKELETON + DEAD)
-                self.game.current_floor.remove_enemy(self)
+                self.game.floor.remove_enemy(self)
                 self.alive = False
     
     def hit(self, target):

@@ -269,17 +269,31 @@ class Floor:
         doors = []
         # can get away with check if its not a wall because
         # only walls and doors have been rendered so far
-        for x in range(tl[0], tr[0]):
+        for x in range(tl[0], tr[0]+1):
             if self.layout[x][tl[1]-1] != 1:
                 doors.append([x, tl[1]-1])
             if self.layout[x][bl[1]+1] != 1:
                 doors.append([x, bl[1]+1])
-        for y in range(tl[1], bl[1]):
+        for y in range(tl[1], bl[1]+1):
             if self.layout[tl[0]-1][y] != 1:
                 doors.append([tl[0]-1, y])
             if self.layout[tr[0]+1][y] != 1:
                 doors.append([tr[0]+1, y])
         return doors
+
+    def validate_floor(self):
+        """
+        Checks that all 5 of the expected doors have
+        been placed
+        :return: bool
+        """
+        needed_doors = [FDOOR, IDOOR, ADOOR, EDOOR, FDOOR]
+        fl = self.layout
+        for x in range(MAP_WIDTH):
+            for y in range(MAP_HEIGHT):
+                if fl[x][y] in needed_doors:
+                    needed_doors.remove(fl[x][y])
+        return len(needed_doors) == 0
 
     def populate_floor(self):
         """

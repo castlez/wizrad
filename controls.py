@@ -4,7 +4,7 @@ INVENTORY = lambda event: event.key == pg.K_i
 ICHECK = lambda event: event.type == pg.MOUSEBUTTONUP and event.button == 1
 ISELECT = lambda event: event.type == pg.MOUSEBUTTONUP and event.button == 3
 QUIT_GAME = lambda event: event.key == pg.K_ESCAPE
-QUIT_SAVE = lambda event: event.key == pg.K_m
+SAVE_MAP = lambda event: event.key == pg.K_m
 MOVE_LEFT = lambda event: event.key == pg.K_a
 MOVE_RIGHT = lambda event: event.key == pg.K_d
 MOVE_UP = lambda event: event.key == pg.K_w

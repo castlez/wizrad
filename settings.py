@@ -100,7 +100,7 @@ SPELL_BUFFER = 0
 SPELL_SIZE = int(TILESIZE/2)
 
 # Fire
-FIRE = "F"
+FIRE = "f"
 FDOOR = "FD" 
 FCOLOR = RED
 FMIN = 20

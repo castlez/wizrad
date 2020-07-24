@@ -29,7 +29,7 @@ class Player(pg.sprite.Sprite):
         self.dy = 0
         
         # position in the level
-        fl = self.game.current_floor.layout
+        fl = self.game.floor.layout
         for x in range(MAP_WIDTH):
             for y in range(MAP_HEIGHT):
                 if fl[x][y] == PLAYER:

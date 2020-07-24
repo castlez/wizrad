@@ -109,7 +109,7 @@ class Spell(pg.sprite.Sprite):
                 self.game.player.is_firing = False
             else:
                 # update loc
-                # x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+                # x, y = self.game.floor.get_local_pos(self.gx, self.gy)
                 self.lastx = self.x
                 self.lasty = self.y
                 self.x += tx

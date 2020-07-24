@@ -30,7 +30,7 @@ class Game:
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         pg.key.set_repeat(SPRINT_DELAY, SPRINT_SPEED)
-        self.current_floor = None
+        self.floor = None
         self.view = None
         self.load_data()
         self.show_grid = True
@@ -61,13 +61,17 @@ class Game:
         self.inventory = Inventory(self, 0, 0)
         self.start_screen = StartScreen(self)
 
-        # first floor (TODO start screen)
-        self.current_floor = Floor(self, 1)
-        self.current_floor.populate_floor()
+        # floor
+        good_floor = False
+        while not good_floor:
+            self.floor = Floor(self, 1)
+            self.floor.populate_floor()
+            if self.floor.validate_floor():
+                break
         self.player = Player(self, PLAYER_X, PLAYER_Y)
 
         # # put the player in a random place
-        # gx, gy = self.current_floor.get_valid_pos()
+        # gx, gy = self.floor.get_valid_pos()
         # self.player.update_global_position(gx, gy)
 
         # start the engines
@@ -89,7 +93,7 @@ class Game:
     
     def save_map(self):
         map_string = ""
-        fl = self.current_floor.layout
+        fl = self.floor.layout
         px = self.player.gx
         py = self.player.gy
         for y in range(0, MAP_HEIGHT):
@@ -135,7 +139,7 @@ class Game:
                 self.enemies.update()
                 self.inters.update()
                 self.doors.update()
-                self.current_floor.update_viewport(cur_g_x, cur_g_y)
+                self.floor.update_viewport(cur_g_x, cur_g_y)
                 self.player.still = True
                 self.tick = False
                 self.player.dx = 0
@@ -198,8 +202,8 @@ class Game:
                 if event.type == pg.KEYDOWN:
                     if QUIT_GAME(event):
                         self.quit()
-                    if QUIT_SAVE(event):
-                        self.quit(save_map=True)
+                    if SAVE_MAP(event):
+                        self.save_map()
                     if MOVE_LEFT(event):
                         self.player.move(dx=-1)
                     if MOVE_RIGHT(event):
@@ -234,7 +238,7 @@ class Game:
                         for d in self.doors:
                             print(f"{d.element}: {[d.gx, d.gy]}")
                         print(f"room:")
-                        room = self.current_floor.get_room(self.player.gx, self.player.gy)
+                        room = self.floor.get_room(self.player.gx, self.player.gy)
                         if room:
                             print(f"corners = [tl, tr, bl, br]")
                             print(f"{room['corners'][0]} {room['corners'][1]}")
