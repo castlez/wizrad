@@ -23,6 +23,6 @@ class HealingPotion(WITEM):
         Heal the player HP_POT % of their health 
         rounded to the nearest integer
         """
-        self.game.player.heal_hp(HP_POT)
-        self.game.log.info(f"I drank a healing potion healing {int(HP_POT*100)}% of my health")
+        cur_hp = self.game.player.heal_hp(HP_POT)
+        self.game.log.info(f"I drank a healing potion healing {int(HP_POT*100)}% of my health (hp: {cur_hp})")
     

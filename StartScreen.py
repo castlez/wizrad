@@ -17,8 +17,8 @@ class StartScreen:
         self.button_map = [{
             "text_content": "Claim your Destiny",
             "action": "start",
-            "x": PLAYER_X,
-            "y": PLAYER_Y,
+            "x": ((PLAYER_X) * TILESIZE),
+            "y": ((PLAYER_Y) * TILESIZE),
             "color": YELLOW,
             "image": None,
         }]
@@ -40,8 +40,8 @@ class StartScreen:
             image.fill(b["color"])
             b["image"] = image
             r = image.get_rect()
-            r.x = b["x"] * TILESIZE
-            r.y = b["y"] * TILESIZE
+            r.x = b["x"]
+            r.y = b["y"]
             b["rect"] = r
 
     def quit(self):
@@ -73,9 +73,11 @@ class StartScreen:
         for b in self.button_map:
             image = b["image"]
             rect = image.get_rect()
-            rect.x = b["x"] * TILESIZE
-            rect.y = b["y"] * TILESIZE
-            screen.blit(image, (rect.x, rect.y))
+            bx = b["x"]
+            by = b["y"]
+            screen.blit(image, (bx, by))
 
+            tx = b["x"] - 50
+            ty = b["y"] - 50
             text = self.font.render(b["text_content"], True, (255, 255, 255), (0, 0, 0))
-            screen.blit(text, (b["rect"].x, b["rect"].y))
+            screen.blit(text, (tx, ty))

@@ -38,7 +38,7 @@ class Game:
         self.tick = False
         self.show_inventory = False
         self.show_startscreen = True  # start with start screen
-        self.godmode = GODMODE
+        self.godmode = False
         self.playing = False
 
         self.win = False  # the game has been won
@@ -270,6 +270,7 @@ class Game:
         prints the help message
         """
         self.log.info("[H, help]  [L-Click inspect]  [R-Click, interact ]  [Space, fire spell ]  [I, inventory]")
+        self.log.info("[RSHIFT|LSHIFT, use equipped item], [Esc, quite], [m, quite and save map]")
     
     def object_in_view(self, gx, gy):
         """

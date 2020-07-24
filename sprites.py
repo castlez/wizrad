@@ -144,7 +144,7 @@ class Wall(WSPRITE):
         return "I think its.. well, it might be.. yeah that is! Its a wall!"
     
     def take_damage(self, amount):
-        self.game.log.info(f"You would have done {amount} damage to the wall, if that was possible.")
+        pass
 
 class Door(WSPRITE):
     def __init__(self, element, game, x, y, gx, gy):
@@ -187,6 +187,7 @@ class Door(WSPRITE):
         if player.has_element(self.element):
             self.set_sign(self.element + DEAD)
             # TODO: make this personalized for each element
+            self.game.current_floor.remove_inter(self)
             return "The magic leaps from my hands, unlocking the door!"
         else:
             return "Hmmm, touching the door did nothing. Perhaps I need another element?"
@@ -387,34 +388,35 @@ class Skeleton(WSPRITE):
             # check collisions
             blocked = False
             hit_sprite = None
-            for sprite in self.game.all_sprites:
-                try:
-                    if sprite.x == newx and sprite.y == newy and sprite != self:
-                        self.hit(sprite)
-                        if sprite.blocking:
-                            # if it collides with a sprite and it isnt itself, block
-                            blocked = True
-                except:
-                    pass
+            if self.alive:
+                for sprite in self.game.all_sprites:
+                    try:
+                        if sprite.x == newx and sprite.y == newy and sprite != self:
+                            self.hit(sprite)
+                            if sprite.blocking:
+                                # if it collides with a sprite and it isnt itself, block
+                                blocked = True
+                    except:
+                        pass
 
-            # if we are unblocked and can see the player
-            # then we check if we are already next to the player
-            # and if not, we move
-            if not blocked and see_player and not self.skip:
-                self.gx += cx
-                self.gy += cy
+                # if we are unblocked and can see the player
+                # then we check if we are already next to the player
+                # and if not, we move
+                if not blocked and see_player and not self.skip:
+                    self.gx += cx
+                    self.gy += cy
 
-                x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
-                self.x = x
-                self.y = y
-                    
-            else:
-                # just adjust for viewpoint movement
-                self.x -= self.game.player.dx
-                self.y -= self.game.player.dy
-                self.skip = False
-            self.rect.x = self.x * TILESIZE
-            self.rect.y = self.y * TILESIZE
+                    x, y = self.game.current_floor.get_local_pos(self.gx, self.gy)
+                    self.x = x
+                    self.y = y
+
+                else:
+                    # just adjust for viewpoint movement
+                    self.x -= self.game.player.dx
+                    self.y -= self.game.player.dy
+                    self.skip = False
+                self.rect.x = self.x * TILESIZE
+                self.rect.y = self.y * TILESIZE
 
     def draw(self, screen):
         print("drawing skele")

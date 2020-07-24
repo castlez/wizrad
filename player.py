@@ -200,6 +200,7 @@ class Player(pg.sprite.Sprite):
             new_health = max_health
         new_health = int(new_health)
         self.state.Health.value = new_health
+        return f"{self.state.Health.value}/{self.state.Health.max_value}"
     
     def get_stats(self):
         return self.state.get_stats()

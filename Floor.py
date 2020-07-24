@@ -4,6 +4,8 @@ Floor stuff
 import os
 import random
 
+from math import sqrt
+
 from Items import HealingPotion
 from dg.dungeonGenerationAlgorithms import RoomAddition
 from settings import *
@@ -193,7 +195,7 @@ class Floor:
         # add the new walls, inters, enemies, etc, and keep the floor clear
         for ly, gy in zip(local_y_range, global_y_range):
             for lx, gx in zip(local_x_range, global_x_range):
-                if gx >= MAP_WIDTH or gy >= MAP_HEIGHT:
+                if gx not in range(0, MAP_WIDTH) or gy not in range(0, MAP_HEIGHT):
                     continue
                 try:
                     value = fl[gx][gy]
@@ -331,10 +333,23 @@ class Floor:
                 f.write(mp)
 
         # skeletons
+        # dont spawn em to close
+        # d=√((x_2-x_1)²+(y_2-y_1)²)
         num_skele = random.randint(SKMIN, SKMAX)
+        px = ppos[0]
+        py = ppos[1]
         for _ in range(num_skele):
-            x, y = self.get_valid_pos()
-            self.layout[x][y] = SKELETON
+            placed = False
+            tries = 3
+            while not placed and tries > 0:
+                x, y = self.get_valid_pos()
+                d = int(sqrt(abs((x - px)**2 - (y - py)**2)))
+                if d > S_START_RADIUS:
+                    if self.layout[x][y] == 0:
+                        self.layout[x][y] = SKELETON
+                        placed = True
+                else:
+                    tries -= 1
         
         # chests
         num_chest = random.randint(CHMIN, CHMAX)
