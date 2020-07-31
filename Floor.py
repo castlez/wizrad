@@ -7,7 +7,7 @@ import random
 from math import sqrt
 
 from Items import HealingPotion
-from dg.dungeonGenerationAlgorithms import RoomAddition
+from DungeonGenerate import DGen
 from settings import *
 from settings import FIRE, ACID, ICE, ELEC
 
@@ -43,7 +43,7 @@ class Floor:
         self.game = game
 
         # layout
-        generator = RoomAddition()
+        generator = DGen()
         self.layout, self.rooms = generator.generateLevel(MAP_WIDTH, MAP_HEIGHT)
 
         # loot

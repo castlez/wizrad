@@ -17,7 +17,6 @@ from LogWindow import *
 from player import *
 from Screens import *
 from controls import *
-from dg.dungeonGenerationAlgorithms import RoomAddition
 
 
 class Game:
