@@ -1,5 +1,5 @@
 # wizrad
-A rogue like about rad wizards
+A rogue-like about rad wizards
 
 template taken from KidsCanCode lessons
 
